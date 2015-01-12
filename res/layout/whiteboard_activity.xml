@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFCCCCCC"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+ <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:layout_gravity="center"
+    android:orientation="horizontal"
+    android:layout_marginTop="20dp" >
+  	<ImageButton
+    android:id="@+id/pen"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:contentDescription="@string/brush"
+    android:src="@drawable/pen_colors" />
+    <ImageButton
+    android:id="@+id/eraser"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:contentDescription="@string/erase"
+    android:src="@drawable/eraser" />
+    <ImageButton
+    android:id="@+id/save_btn"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:contentDescription="@string/save"
+    android:src="@drawable/save" />
+    </LinearLayout>
+    <LinearLayout
+    android:id="@+id/linlay"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_marginBottom="3dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="3dp"
+    android:layout_weight="1"
+    android:background="#FFFFFFFF" 
+    android:orientation="vertical">
+    </LinearLayout>
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical" >
+   
+</LinearLayout>
+</LinearLayout>

@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:gravity="center_vertical|top"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+  <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:src="@drawable/collaboard3"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
+
+ <Button
+        android:id="@+id/whiteboard"
+        android:text="Whiteboard"
+        style="@style/ButtonText"
+        android:background="@drawable/layer_wb_button"
+        android:gravity="center"
+        android:paddingLeft="0dp"
+         />
+<Button
+        android:id="@+id/picture"
+        android:text="Share Picture"
+        android:background="@drawable/layer_picture_button"
+        style="@style/ButtonText"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+         />
+    
+<Button
+        android:id="@+id/video"
+        android:text="Share Video"
+        android:background="@drawable/layer_video_button"
+        style="@style/ButtonText"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+         />
+
+    <Button
+        android:id="@+id/document"
+        android:text="Share Document"
+        android:background="@drawable/layer_doc_button"
+        style="@style/ButtonText"
+        android:gravity="center"
+        android:paddingLeft="60dp"
+         />
+
+    <Button
+        android:id="@+id/music"
+        android:text="Share Music"
+        android:background="@drawable/layer_music_button"
+        style="@style/ButtonText"
+        android:gravity="center"
+        android:paddingLeft="18dp"
+         />
+
+    <Button
+        android:id="@+id/survey"
+        android:text="Create Survey"
+        android:background="@drawable/layer_createsurvey_button"
+        style="@style/ButtonText"
+        android:gravity="center"
+        android:paddingLeft="30dp"
+         />
+    
+    
+
+</LinearLayout>
