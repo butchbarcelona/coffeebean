@@ -1,5 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -40,15 +42,6 @@ public class HostOptionsActivity extends Activity {
         txt4.setTypeface(font);
         txt5.setTypeface(font);
         txt6.setTypeface(font);
-       
-        
-        
-        
-        
-        
-        
-        
-        
         
         whiteboard = (Button) findViewById(R.id.whiteboard);
         picture = (Button) findViewById(R.id.picture);
@@ -63,7 +56,6 @@ public class HostOptionsActivity extends Activity {
                 Intent whiteboard = new Intent(getApplicationContext(),
                         WhiteboardActivity.class);
                 startActivity(whiteboard);
-                finish();
             }
         });
 
@@ -109,8 +101,22 @@ public class HostOptionsActivity extends Activity {
                 Intent survey = new Intent(getApplicationContext(),
                         SurveyActivity.class);
                 startActivity(survey);
-                finish();
             }
         });
+        
+        
+        ChordConnectionManager.getInstance().initChord(this);
+        
+        
     }
+    
+    
+    @Override
+    protected void onDestroy() {
+    	// TODO Auto-generated method stub
+    	super.onDestroy();
+    	ChordConnectionManager.getInstance().stopChord();
+    
+    }
+    
 }

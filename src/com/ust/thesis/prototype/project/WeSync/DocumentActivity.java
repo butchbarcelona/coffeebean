@@ -1,5 +1,8 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
@@ -15,5 +18,11 @@ public class DocumentActivity extends Activity {
        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
              WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.document_activity);
+        
+        
+        
+
+        //TODO: chord
+       //ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.SHOW_DOCUMENT);
     }
 }

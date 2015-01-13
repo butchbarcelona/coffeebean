@@ -10,6 +10,8 @@ import com.samsung.android.sdk.chord.Schord;
 import com.samsung.android.sdk.chord.SchordChannel;
 import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -57,18 +59,17 @@ public class WhiteboardActivity extends Activity implements OnTouchListener{
 	  //for doodle
 	  private float x;
 	    private float y;
-	    DrawPanel drawingPanel;
+	    static DrawPanel drawingPanel;
 	    Canvas c;
+	    
+	    static int width;
+		static int height;
 	    
 	    @Override
 	    public void onBackPressed()
 	    {
 	         // code here to show dialog
 	         super.onBackPressed();  // optional depending on your needs
-	         stopChord();
-	         Intent whiteboard = new Intent(getApplicationContext(),
-                     HostOptionsActivity.class);
-             startActivity(whiteboard);
              finish();
 	    }
 	  
@@ -173,7 +174,10 @@ public class WhiteboardActivity extends Activity implements OnTouchListener{
         	
     }});
         
-        
+
+    	Display v = WhiteboardActivity.this.getWindowManager().getDefaultDisplay();
+    	width = v.getWidth();
+        height = v.getHeight();
         
         
     }
@@ -204,368 +208,38 @@ public class WhiteboardActivity extends Activity implements OnTouchListener{
         payload[0] = shella.getBytes();
         
         
-        List<Integer> infList = mChordManager.getAvailableInterfaceTypes();
+        List<Integer> infList = ChordConnectionManager.mChordManager.getAvailableInterfaceTypes();
+        
         if(infList.isEmpty()){
             System.out.println("    There is no available connection.");
             
         }else{
         
-        SchordChannel channel = mChordManager.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
-        channel.sendDataToAll(CHORD_SAMPLE_MESSAGE_TYPE, payload);
+        	ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.WHITEBOARD); 
         
         if(mev.getActionMasked() == MotionEvent.ACTION_UP){
         	String end = "end";
         	 payload = new byte[1][];
              payload[0] = end.getBytes();
-
-             channel = mChordManager.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
-             channel.sendDataToAll(CHORD_SAMPLE_MESSAGE_TYPE, payload);
-             	  
+ 
+         	ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.WHITEBOARD);	  
          }
         }
-        //Toast.makeText(this, msg+"\n X - "+x+"\nY - "+y, Toast.LENGTH_SHORT).show();
         return false;
     }
     
     
-    
-    @Override
-    public void onResume() {
-        super.onResume();
+    public static void drawBoard(byte[][] payload){
+    	String message = new String(payload[0]);  
 
-        /**
-         * [A] Initialize Chord!
-         */
-        if (mChordManager == null) {
-            initChord();
-        }
-    }
-    
-    //Chord specific code, copied from BasicChordSample (Samsung Mobile SDK 1.0.3)
-    private static final String CHORD_HELLO_TEST_CHANNEL = "com.samsung.android.sdk.chord.example.HELLOTESTCHANNEL";
-	private static final String CHORD_SAMPLE_MESSAGE_TYPE = "com.samsung.android.sdk.chord.example.MESSAGE_TYPE";
-	private SchordManager mChordManager = null;
-	private int mSelectedInterface = -1;
-	
-    private void initChord() {
-
-    	System.out.print("INIT CHORD");
-        /****************************************************
-         * 1. GetInstance
-         ****************************************************/
-        
-        Schord chord = new Schord();        
-        try {
-            chord.initialize(this);
-        } catch (SsdkUnsupportedException e) {
-            if (e.getType() == SsdkUnsupportedException.VENDOR_NOT_SUPPORTED) {
-                // Vendor is not SAMSUNG
-                return;
-            }
-        }        
-        mChordManager = new SchordManager(this);
-       
-        /****************************************************
-         * 2. Set some values before start If you want to use secured channel,
-         * you should enable SecureMode. Please refer
-         * UseSecureChannelFragment.java mChordManager.enableSecureMode(true);
-         * 
-         *
-         * Once you will use sendFile or sendMultiFiles, you have to call setTempDirectory  
-         * mChordManager.setTempDirectory(Environment.getExternalStorageDirectory().getAbsolutePath()
-         *       + "/Chord");
-         ****************************************************/
-        mChordManager.setLooper(this.getMainLooper());
-
-        /**
-         * Optional. If you need listening network changed, you can set callback
-         * before starting chord.
-         */
-        mChordManager.setNetworkListener(new NetworkListener() {
-
-            @Override
-            public void onDisconnected(int interfaceType) {
-                if (interfaceType == mSelectedInterface) {
-                    Toast.makeText(WhiteboardActivity.this,
-                            getInterfaceName(interfaceType) + " is disconnected",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onConnected(int interfaceType) {
-                if (interfaceType == mSelectedInterface) {
-                    Toast.makeText(WhiteboardActivity.this,getInterfaceName(interfaceType) + " is connected",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        
-        //auto start connection
-        startChord();
-
-    }
-    
-    private String getInterfaceName(int interfaceType) {
-        if (SchordManager.INTERFACE_TYPE_WIFI == interfaceType)
-            return "Wi-Fi";
-        else if (SchordManager.INTERFACE_TYPE_WIFI_AP == interfaceType)
-            return "Mobile AP";
-        else if (SchordManager.INTERFACE_TYPE_WIFI_P2P == interfaceType)
-            return "Wi-Fi Direct";
-
-        return "UNKNOWN";
-    }
-    
-    
-    private void startChord() {
-        
-         // 3. Start Chord using the first interface in the list of available
-        // interfaces.
-        
-        List<Integer> infList = mChordManager.getAvailableInterfaceTypes();
-        if(infList.isEmpty()){
-            System.out.println("    There is no available connection.");
-            return;
-        }
-        
-        int interfaceType = 0;
-        for (int interfaceValue : mChordManager.getAvailableInterfaceTypes()) {
-            System.out.println("Available interface : " + interfaceValue);
-            if (interfaceValue == SchordManager.INTERFACE_TYPE_WIFI) {
-            	interfaceType = SchordManager.INTERFACE_TYPE_WIFI;
-            	System.out.println("ChordManager.INTERFACE_TYPE_WIFI");
-            	break;
-            } else if (interfaceValue == SchordManager.INTERFACE_TYPE_WIFI_AP) {
-            	interfaceType = SchordManager.INTERFACE_TYPE_WIFI_AP;
-            	System.out.println("ChordManager.INTERFACE_TYPE_WIFI_AP");
-            	break;
-            } else if (interfaceValue == SchordManager.INTERFACE_TYPE_WIFI_P2P) {
-            	interfaceType = SchordManager.INTERFACE_TYPE_WIFI_P2P;
-            	System.out.println("ChordManager.INTERFACE_TYPE_WIFI_P2P");
-            	break;
-            }
-        }
-        
-        try {
-            mChordManager.start(interfaceType, mManagerListener);
-            mSelectedInterface = interfaceType;
-            System.out.println("    start(" + getInterfaceName(interfaceType) + ")");
-        } catch (IllegalArgumentException e) {
-            System.out.println("    Fail to start -" + e.getMessage());
-        } catch (InvalidInterfaceException e) {
-            System.out.println("    There is no such a connection.");
-        } catch (Exception e) {
-            System.out.println("    Fail to start -" + e.getMessage());
-        }
-    }
-    
-    /**
-     * ChordManagerListener
-     */
-    
-    SchordManager.StatusListener mManagerListener = new SchordManager.StatusListener() {
-
-        @Override
-        public void onStarted(String nodeName, int reason) {
-            
-            // 4. Chord has started successfully
-             
-            if (reason == STARTED_BY_USER) {
-                // Success to start by calling start() method
-                System.out.println("    >onStarted(" + nodeName + ", STARTED_BY_USER)");
-                joinTestChannel();
-            } else if (reason == STARTED_BY_RECONNECTION) {
-                // Re-start by network re-connection.
-                System.out.println("    >onStarted(" + nodeName + ", STARTED_BY_RECONNECTION)");
-            }
-
-        }
-
-        @Override
-        public void onStopped(int reason) {
-            
-            //  8. Chord has stopped successfully
-             
-            if (STOPPED_BY_USER == reason) {
-                // Success to stop by calling stop() method
-                System.out.println("    >onStopped(STOPPED_BY_USER)");
-            } else if (NETWORK_DISCONNECTED == reason) {
-                // Stopped by network disconnected
-                System.out.println("    >onStopped(NETWORK_DISCONNECTED)");
-            }
-        }
-    };
-    
-    private void joinTestChannel() {
-        SchordChannel channel = null;
-        
-       //   5. Join my channel
-         
-        System.out.println("    joinChannel");
-        channel = mChordManager.joinChannel(CHORD_HELLO_TEST_CHANNEL, mChannelListener);
-
-        if (channel == null) {
-            System.out.println("    Fail to joinChannel");
-        }
-    }
-
-    private void stopChord() {
-        if (mChordManager == null)
-            return;
-
-        
-         // If you registered NetworkListener, you should unregister it.
-         
-        mChordManager.setNetworkListener(null);
-
-        
-         // 7. Stop Chord. You can call leaveChannel explicitly.
-         // mChordManager.leaveChannel(CHORD_HELLO_TEST_CHANNEL);
-         
-        System.out.println("    stop");
-        mChordManager.stop();
-    }
-
-    // ***************************************************
-    // ChordChannelListener
-    // ***************************************************
-    private SchordChannel.StatusListener mChannelListener = new SchordChannel.StatusListener() {
-
-        //Called when a node leave event is raised on the channel.
-        
-        @Override
-        public void onNodeLeft(String fromNode, String fromChannel) {
-            System.out.println("    >onNodeLeft(" + fromNode + ")");
-        }
-
-        //Called when a node join event is raised on the channel
-        
-        @Override
-        public void onNodeJoined(String fromNode, String fromChannel) {
-            System.out.println("    >onNodeJoined(" + fromNode + ")");
-
-            //6. Send data to joined node
+       if (message.equals("end")){
+    	   drawingPanel.EndDrawFromOther();
+       }
+        else{
+        	String[] msg = message.split(",");
            
-            System.out.println( "onNodeJoined node="+fromNode+" channel="+fromChannel+" bJoined=true");
-            Toast.makeText(WhiteboardActivity.this,"Connected",Toast.LENGTH_SHORT).show();
-            //Toast.makeText(SurveyActivity.this,"onNodeJoined node="+fromNode+" channel="+fromChannel+" bJoined=true",Toast.LENGTH_SHORT).show();
-    		
-			//sendState(mIamReadyCheckbox.isChecked());
-			//sendState(true);
-		
+            drawingPanel.DrawFromOther(msg[0],Double.parseDouble(msg[1])*width,Double.parseDouble(msg[2])*height);
         }
-
-        //Called when the data message received from the node.
-         
-        @Override
-        public void onDataReceived(String fromNode, String fromChannel, String payloadType,
-                byte[][] payload) {
-            //6. Received data from other node
-             
-        	String message = new String(payload[0]);
-        	System.out.println("    >onDataReceived(" + fromNode + ", " + message + ")");
-            if(!payloadType.equals(CHORD_SAMPLE_MESSAGE_TYPE)){
-                return;
-            }
-        	//10-07 23:48:59.377: I/System.out(17328):     >onDataReceived(hWvaa*7avw#3F36A, Sampletext to send)
-
-           if (message.equals("end")){
-        	   drawingPanel.EndDrawFromOther();
-           }
-            else{
-            	String[] msg = message.split(",");
-            	Display v = getWindowManager().getDefaultDisplay();
-            	int width = v.getWidth();
-                int height = v.getHeight();
-               
-                drawingPanel.DrawFromOther(msg[0],Double.parseDouble(msg[1])*width,Double.parseDouble(msg[2])*height);
-            }
- 
-        }
-        
-       // The following callBacks are not used in this Fragment. Please refer
-         // to the SendFilesFragment.java
-         
-        @Override
-        public void onMultiFilesWillReceive(String fromNode, String fromChannel, String fileName,
-                String taskId, int totalCount, String fileType, long fileSize) {
-
-        }
-
-        @Override
-        public void onMultiFilesSent(String toNode, String toChannel, String fileName,
-                String taskId, int index, String fileType) {
-
-        }
-
-        @Override
-        public void onMultiFilesReceived(String fromNode, String fromChannel, String fileName,
-                String taskId, int index, String fileType, long fileSize, String tmpFilePath) {
-
-        }
-
-        @Override
-        public void onMultiFilesFinished(String node, String channel, String taskId, int reason) {
-
-        }
-
-        @Override
-        public void onMultiFilesFailed(String node, String channel, String fileName, String taskId,
-                int index, int reason) {
-
-        }
-
-        @Override
-        public void onMultiFilesChunkSent(String toNode, String toChannel, String fileName,
-                String taskId, int index, String fileType, long fileSize, long offset,
-                long chunkSize) {
-
-        }
-
-        @Override
-        public void onMultiFilesChunkReceived(String fromNode, String fromChannel, String fileName,
-                String taskId, int index, String fileType, long fileSize, long offset) {
-
-        }
-
-        @Override
-        public void onFileWillReceive(String fromNode, String fromChannel, String fileName,
-                String hash, String fileType, String exchangeId, long fileSize) {
-
-        }
-
-        @Override
-        public void onFileSent(String toNode, String toChannel, String fileName, String hash,
-                String fileType, String exchangeId) {
-
-        }
-
-        @Override
-        public void onFileReceived(String fromNode, String fromChannel, String fileName,
-                String hash, String fileType, String exchangeId, long fileSize, String tmpFilePath) {
-
-        }
-
-        @Override
-        public void onFileFailed(String node, String channel, String fileName, String hash,
-                String exchangeId, int reason) {
-
-        }
-
-        @Override
-        public void onFileChunkSent(String toNode, String toChannel, String fileName, String hash,
-                String fileType, String exchangeId, long fileSize, long offset, long chunkSize) {
-
-        }
-
-        @Override
-        public void onFileChunkReceived(String fromNode, String fromChannel, String fileName,
-                String hash, String fileType, String exchangeId, long fileSize, long offset) {
-
-        }
-
-    };
-    
+    }
     
 }
