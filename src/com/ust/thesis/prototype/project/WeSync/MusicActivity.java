@@ -23,7 +23,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 
 /**
@@ -32,7 +32,7 @@ import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
 public class MusicActivity extends Activity {
 	Button button1;
 	ImageView playmusic;
-	MediaPlayer mp;
+	static MediaPlayer mp;
 	String[] musicname;
 	String[] musicpath;
 	String mname="",mpath="";
@@ -40,7 +40,6 @@ public class MusicActivity extends Activity {
 	AlertDialog levelDialog;
 	int countfile=0;
 
-	static MediaPlayer mediaPlayer;
 	static File pathToCache;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -91,7 +90,7 @@ public class MusicActivity extends Activity {
 						payload[0] = data;
 
 						//TODO: chord
-						ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.MUSIC_PLAY);
+						ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.MUSIC_PLAY);
 
 
 					} catch (IllegalArgumentException e) {
@@ -196,8 +195,10 @@ public class MusicActivity extends Activity {
 	{
 		super.onBackPressed();  
 
-		if(mediaPlayer.isPlaying())
-			mediaPlayer.stop();
+		if(mp != null){
+			if(mp.isPlaying())
+				mp.stop();
+		}
 
 
 		finish();
@@ -213,18 +214,26 @@ public class MusicActivity extends Activity {
 			fos.write(mp3SoundByteArray);
 			fos.close();
 
+			
+			if(mp != null){
+				if(mp.isPlaying())
+					mp.stop();
+			}
+			
+			
+			
 			// Tried reusing instance of media player
 			// but that resulted in system crashes...  
-			mediaPlayer = new MediaPlayer();
+			mp = new MediaPlayer();
 
 			// Tried passing path directly, but kept getting 
 			// "Prepare failed.: status=0x1"
 			// so using file descriptor instead
 			FileInputStream fis = new FileInputStream(tempMp3);
-			mediaPlayer.setDataSource(fis.getFD());
+			mp.setDataSource(fis.getFD());
 
-			mediaPlayer.prepare();
-			mediaPlayer.start();
+			mp.prepare();
+			mp.start();
 		} catch (IOException ex) {
 			String s = ex.toString();
 			ex.printStackTrace();

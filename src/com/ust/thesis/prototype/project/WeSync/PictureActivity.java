@@ -20,7 +20,7 @@ import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
 import com.ust.thesis.prototype.project.WeSync.ExplorerChordMessage.MessageType;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -123,7 +123,7 @@ public class PictureActivity extends Activity {
 
 
     			            	        //TODO: chord
-    			            	        ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.SHOW_PICTURE);
+    			            	        ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.SHOW_PICTURE);
 
 						}
 					});

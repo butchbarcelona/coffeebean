@@ -1,57 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.ust.thesis.prototype.project.WeSync">
-     <uses-sdk
+    package="com.ust.thesis.prototype.project.WeSync" >
+
+    <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
-     
-    <application 
-        android:icon="@drawable/icon" 
+
+    <application
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-         android:theme="@style/AppTheme" >
-         
-        <activity 
+        android:theme="@style/AppTheme" >
+        <activity
             android:name=".HomePageActivity"
-             android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreatePasswordActivity"
-            android:screenOrientation="portrait"
-                  android:label="Create Password"/>
-        <activity android:name=".InsertPasswordActivity"
-            android:screenOrientation="portrait"
-                  android:label="Insert Password"/>
-        <activity android:name=".HostOptionsActivity"
-            android:screenOrientation="portrait"
-                  android:label="Host"/>
-        <activity android:name=".MemberOptionsActivity"
-            android:screenOrientation="portrait"
-                  android:label="Share"/>
-        <activity android:name=".WhiteboardActivity"
-                  android:label="WhiteboardActivity"/>
-        <activity android:name=".DocumentActivity"
-            android:screenOrientation="portrait"
-                  android:label="Document"/>
-        <activity android:name=".PictureActivity"
-            android:screenOrientation="portrait"
-                  android:label="Picture"/>
-        <activity android:name=".VideoActivity"
-            android:screenOrientation="portrait"
-                  android:label="Video"/>
-        <activity android:name=".SurveyActivity"
-            android:screenOrientation="portrait"
-                  android:label="Survey"/>
-        <activity android:name=".MusicActivity"
-            android:screenOrientation="portrait"
-                  android:label="Music"/>
+        <activity
+            android:name=".CreatePasswordActivity"
+            android:label="Create Password"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".InsertPasswordActivity"
+            android:label="Insert Password"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HostOptionsActivity"
+            android:label="Host"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MemberOptionsActivity"
+            android:label="Share"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WhiteboardActivity"
+            android:label="WhiteboardActivity" />
+        <activity
+            android:name=".DocumentActivity"
+            android:label="Document"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PictureActivity"
+            android:label="Picture"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VideoActivity"
+            android:label="Video"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SurveyActivity"
+            android:label="Survey"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MusicActivity"
+            android:label="Music"
+            android:screenOrientation="portrait" />
+
+        <receiver android:name="com.ust.thesis.prototype.project.WeSync.chord.WifiChangeStateReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
 </manifest>

@@ -1,7 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync;
 
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 import android.app.Activity;
 import android.os.Bundle;

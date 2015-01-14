@@ -11,7 +11,7 @@ import com.samsung.android.sdk.chord.SchordChannel;
 import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -215,14 +215,14 @@ public class WhiteboardActivity extends Activity implements OnTouchListener{
             
         }else{
         
-        	ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.WHITEBOARD); 
+        	ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.WHITEBOARD); 
         
         if(mev.getActionMasked() == MotionEvent.ACTION_UP){
         	String end = "end";
         	 payload = new byte[1][];
              payload[0] = end.getBytes();
  
-         	ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.WHITEBOARD);	  
+         	ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.WHITEBOARD);	  
          }
         }
         return false;

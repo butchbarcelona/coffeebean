@@ -35,7 +35,7 @@ import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
 import com.ust.thesis.prototype.project.WeSync.ExplorerChordMessage.MessageType;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.SyncMessageType;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -132,7 +132,7 @@ public class VideoActivity extends Activity {
 						/*SchordChannel channel = mChordManager.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
 	            	        channel.sendDataToAll(CHORD_SAMPLE_MESSAGE_TYPE, payload);*/
 
-	            	        ChordConnectionManager.getInstance().sendData(payload, SyncMessageType.VIDEO_PLAY);
+	            	        ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.VIDEO_PLAY);
 
 
 					} catch (FileNotFoundException e) {

@@ -1,24 +1,29 @@
 package com.ust.thesis.prototype.project.WeSync;
 
-import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
 
 /**
  * Created by robertjordanebdalin on 8/28/14.
  */
-public class HostOptionsActivity extends Activity {
+public class HostOptionsActivity extends Activity implements OnClickListener{
 
     Button whiteboard, picture, video, document, music, survey;
-
+    ListView mDrawerList;
+    static ArrayAdapter<String> drawerListAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +32,13 @@ public class HostOptionsActivity extends Activity {
               WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.host_options_activity);
        
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        drawerListAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1
+                , ChordConnectionManager.getInstance().getArrMembers() );
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(drawerListAdapter);
+        
         TextView txt1 = (TextView) findViewById(R.id.whiteboard);
         TextView txt2 = (TextView) findViewById(R.id.picture);
         TextView txt3 = (TextView) findViewById(R.id.music);
@@ -105,9 +117,13 @@ public class HostOptionsActivity extends Activity {
         });
         
         
-        ChordConnectionManager.getInstance().initChord(this);
-        
-        
+        ChordConnectionManager.getInstance().initChord(this); 
+    }
+    
+    
+    public static void refreshMemberList(String member){
+    	drawerListAdapter.add(member);
+    	drawerListAdapter.notifyDataSetChanged();
     }
     
     
@@ -118,5 +134,15 @@ public class HostOptionsActivity extends Activity {
     	ChordConnectionManager.getInstance().stopChord();
     
     }
+
+
+	@Override
+	public void onClick(View v) {
+		
+		switch(v.getId()){
+		
+		}
+		
+	}
     
 }

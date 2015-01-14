@@ -1,72 +1,97 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:gravity="center_vertical|top"
-    android:orientation="vertical"
-    android:padding="10dp" >
+    android:layout_height="match_parent" >
 
-  <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:src="@drawable/collaboard3"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp" />
+    <!-- The main content view -->
 
- <Button
-        android:id="@+id/whiteboard"
-        android:text="Whiteboard"
-        style="@style/ButtonText"
-        android:background="@drawable/layer_wb_button"
-        android:gravity="center"
-        android:paddingLeft="0dp"
-         />
-<Button
-        android:id="@+id/picture"
-        android:text="Share Picture"
-        android:background="@drawable/layer_picture_button"
-        style="@style/ButtonText"
-        android:gravity="center"
-        android:paddingLeft="20dp"
-         />
-    
-<Button
-        android:id="@+id/video"
-        android:text="Share Video"
-        android:background="@drawable/layer_video_button"
-        style="@style/ButtonText"
-        android:gravity="center"
-        android:paddingLeft="10dp"
-         />
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/document"
-        android:text="Share Document"
-        android:background="@drawable/layer_doc_button"
-        style="@style/ButtonText"
-        android:gravity="center"
-        android:paddingLeft="60dp"
-         />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:gravity="center_vertical|top"
+            android:orientation="vertical"
+            android:padding="10dp" >
 
-    <Button
-        android:id="@+id/music"
-        android:text="Share Music"
-        android:background="@drawable/layer_music_button"
-        style="@style/ButtonText"
-        android:gravity="center"
-        android:paddingLeft="18dp"
-         />
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/collaboard3" />
 
-    <Button
-        android:id="@+id/survey"
-        android:text="Create Survey"
-        android:background="@drawable/layer_createsurvey_button"
-        style="@style/ButtonText"
-        android:gravity="center"
-        android:paddingLeft="30dp"
-         />
-    
-    
+            <Button
+                android:id="@+id/whiteboard"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_wb_button"
+                android:gravity="center"
+                android:paddingLeft="0dp"
+                android:text="Whiteboard" />
 
-</LinearLayout>
+            <Button
+                android:id="@+id/picture"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_picture_button"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:text="Share Picture" />
+
+            <Button
+                android:id="@+id/video"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_video_button"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:text="Share Video" />
+
+            <Button
+                android:id="@+id/document"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_doc_button"
+                android:gravity="center"
+                android:paddingLeft="60dp"
+                android:text="Share Document" />
+
+            <Button
+                android:id="@+id/music"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_music_button"
+                android:gravity="center"
+                android:paddingLeft="18dp"
+                android:text="Share Music" />
+
+            <Button
+                android:id="@+id/survey"
+                style="@style/ButtonText"
+                android:background="@drawable/layer_createsurvey_button"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:text="Create Survey" />
+        </LinearLayout>
+<!-- 
+        <Button
+            android:id="@+id/btn_members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Members" /> -->
+    </FrameLayout>
+    <!-- The navigation drawer -->
+
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#111"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
+
+</android.support.v4.widget.DrawerLayout>
