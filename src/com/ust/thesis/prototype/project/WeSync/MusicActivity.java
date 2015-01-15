@@ -25,54 +25,55 @@ import android.widget.Toast;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
-
 /**
  * Created by robertjordanebdalin on 8/28/14.
  */
-public class MusicActivity extends Activity {
+public class MusicActivity extends ChordActivity {
 	Button button1;
 	ImageView playmusic;
 	static MediaPlayer mp;
 	String[] musicname;
 	String[] musicpath;
-	String mname="",mpath="";
+	String mname = "", mpath = "";
 	int chosen;
 	AlertDialog levelDialog;
-	int countfile=0;
+	int countfile = 0;
 
 	static File pathToCache;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.music_activity);
 
 		pathToCache = getCacheDir();
 		walkdir(Environment.getExternalStorageDirectory());
 
-		button1 = (Button)findViewById(R.id.button1);
-		playmusic = (ImageView)findViewById(R.id.playmusic);
+		button1 = (Button) findViewById(R.id.button1);
+		playmusic = (ImageView) findViewById(R.id.playmusic);
 
-		playmusic.setOnClickListener( new OnClickListener() {
+		playmusic.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
 				// Play audio
-				if (!(button1.getText().equals("Select Music"))){
+				if (!(button1.getText().equals("Select Music"))) {
 					mp = new MediaPlayer();
-
 
 					// Set data source -
 					try {
 						String filePath = musicpath[chosen];
 						File file = new File(filePath);
-						if (file.exists()) System.out.println("EXIST");
-						else System.out.println("DO NOT EXIST : "+musicpath[chosen]);
+						if (file.exists())
+							System.out.println("EXIST");
+						else
+							System.out.println("DO NOT EXIST : "
+									+ musicpath[chosen]);
 						mp.setDataSource(filePath);
 						mp.prepare();
 						mp.start();
-
 
 						ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
@@ -80,7 +81,7 @@ public class MusicActivity extends Activity {
 						byte[] temp = new byte[1024];
 						int read;
 
-						while((read = is.read(temp)) >= 0){
+						while ((read = is.read(temp)) >= 0) {
 							buffer.write(temp, 0, read);
 						}
 
@@ -89,71 +90,74 @@ public class MusicActivity extends Activity {
 						byte[][] payload = new byte[1][];
 						payload[0] = data;
 
-						//TODO: chord
-						ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.MUSIC_PLAY);
-
+						// TODO: chord
+						ChordConnectionManager.getInstance().sendData(payload,
+								ChordMessageType.MUSIC_PLAY);
 
 					} catch (IllegalArgumentException e) {
-						System.out.println("Error : "+e);
+						System.out.println("Error : " + e);
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (SecurityException e) {
-						System.out.println("Error 1: "+e);
+						System.out.println("Error 1: " + e);
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IllegalStateException e) {
-						System.out.println("Error 2: "+e);
+						System.out.println("Error 2: " + e);
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						System.out.println("Error 3: "+e);
+						System.out.println("Error 3: " + e);
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}  
+					}
 
-				}else Toast.makeText(MusicActivity.this,"NO MUSIC SELECTED",Toast.LENGTH_SHORT).show();
-			}});
+				} else
+					Toast.makeText(MusicActivity.this, "NO MUSIC SELECTED",
+							Toast.LENGTH_SHORT).show();
+			}
+		});
 
-
-
-
-		button1.setOnClickListener( new OnClickListener() {
+		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
 
-
 				String[] tempname = mname.split("%%%%%%");
 				String[] temppath = mpath.split("%%%%%%");
 
-				musicname= new String [tempname.length-1];
-				musicpath= new String [tempname.length-1];
+				musicname = new String[tempname.length - 1];
+				musicpath = new String[tempname.length - 1];
 
-				for(int i = 0;i<tempname.length-1;i++){
-					musicname[i] = tempname[i+1];
-					musicpath[i] = temppath[i+1];
+				for (int i = 0; i < tempname.length - 1; i++) {
+					musicname[i] = tempname[i + 1];
+					musicpath[i] = temppath[i + 1];
 				}
 
-				if (tempname.length>1){
+				if (tempname.length > 1) {
 
-					// Creating and Building the Dialog 
-					AlertDialog.Builder builder = new AlertDialog.Builder(MusicActivity.this);
+					// Creating and Building the Dialog
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							MusicActivity.this);
 					builder.setTitle("Choose music file");
-					builder.setSingleChoiceItems(musicname, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							button1.setText(musicname[item]);
-							chosen = item;
-							levelDialog.dismiss();    
-						}
-					});
+					builder.setSingleChoiceItems(musicname, -1,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int item) {
+									button1.setText(musicname[item]);
+									chosen = item;
+									levelDialog.dismiss();
+								}
+							});
 					levelDialog = builder.create();
 					levelDialog.show();
 
-				}else {
-					Toast.makeText(MusicActivity.this,"NO MUSIC FOUND",
+				} else {
+					Toast.makeText(MusicActivity.this, "NO MUSIC FOUND",
 							Toast.LENGTH_SHORT).show();
 				}
-			}});
+			}
+		});
 
 	}
 
@@ -168,65 +172,69 @@ public class MusicActivity extends Activity {
 
 				if (listFile[i].isDirectory()) {
 					walkdir(listFile[i]);
-					//textView1.setText("Directory: "+listFile[i]);
+					// textView1.setText("Directory: "+listFile[i]);
 				} else {
-					if (listFile[i].getName().endsWith(pdfPattern)){
-						//Do what ever u want
-						mname = mname+"%%%%%%"+listFile[i].getName();
-						mpath = mpath+"%%%%%%"+listFile[i].getPath();
+					if (listFile[i].getName().endsWith(pdfPattern)) {
+						// Do what ever u want
+						mname = mname + "%%%%%%" + listFile[i].getName();
+						mpath = mpath + "%%%%%%" + listFile[i].getPath();
 						System.out.println(mname);
 						System.out.println(mpath);
-						System.out.println("Found : "+listFile[i].getName());
-						System.out.println("Found path : "+listFile[i].getPath());
+						System.out.println("Found : " + listFile[i].getName());
+						System.out.println("Found path : "
+								+ listFile[i].getPath());
 
 					}
 				}
 			}
 		}
 
-
-
-
 	}
 
-
 	@Override
-	public void onBackPressed()
-	{
-		super.onBackPressed();  
+	public void onBackPressed() {
+		super.onBackPressed();
 
-		if(mp != null){
-			if(mp.isPlaying())
+		if (mp != null) {
+			if (mp.isPlaying())
 				mp.stop();
 		}
 
-
 		finish();
 	}
+	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		if(byteArrayMsg != null)
+			playMusic(byteArrayMsg);
+	
+	}
 
+	static byte[] byteArrayMsg = null;
+	
+	public static void playMusic(byte[] mp3Bytes){
 
-	public static void playMp3(byte[] mp3SoundByteArray) {
 		try {
 			// create temp file that will hold byte array
-			File tempMp3 = File.createTempFile("kurchina", "mp3", pathToCache );//getCacheDir());
+			File tempMp3 = File.createTempFile("kurchina", "mp3",
+					pathToCache);// getCacheDir());
 			tempMp3.deleteOnExit();
 			FileOutputStream fos = new FileOutputStream(tempMp3);
-			fos.write(mp3SoundByteArray);
+			fos.write(mp3Bytes);
 			fos.close();
 
-			
-			if(mp != null){
-				if(mp.isPlaying())
+			if (mp != null) {
+				if (mp.isPlaying())
 					mp.stop();
 			}
-			
-			
-			
+
 			// Tried reusing instance of media player
-			// but that resulted in system crashes...  
+			// but that resulted in system crashes...
 			mp = new MediaPlayer();
 
-			// Tried passing path directly, but kept getting 
+			// Tried passing path directly, but kept getting
 			// "Prepare failed.: status=0x1"
 			// so using file descriptor instead
 			FileInputStream fis = new FileInputStream(tempMp3);
@@ -240,6 +248,14 @@ public class MusicActivity extends Activity {
 		}
 	}
 
+	public static void setMp3Bytes(byte[] mp3Bytes) {
 
+		if (isRunning()) {
+			byteArrayMsg = null;
+			playMusic(mp3Bytes);			
+		} else {
+			byteArrayMsg = mp3Bytes;
+		}
+	}
 
 }

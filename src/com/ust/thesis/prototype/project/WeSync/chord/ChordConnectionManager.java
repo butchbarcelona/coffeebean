@@ -1,6 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync.chord;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
@@ -21,6 +22,7 @@ import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
 import com.ust.thesis.prototype.project.WeSync.HostOptionsActivity;
 import com.ust.thesis.prototype.project.WeSync.MusicActivity;
 import com.ust.thesis.prototype.project.WeSync.PictureActivity;
+import com.ust.thesis.prototype.project.WeSync.SurveyActivity;
 import com.ust.thesis.prototype.project.WeSync.VideoActivity;
 import com.ust.thesis.prototype.project.WeSync.WhiteboardActivity;
 
@@ -28,12 +30,14 @@ public class ChordConnectionManager{
 
 	private static ChordConnectionManager instance = null;
 	public static ChordManagerState chordState = ChordManagerState.STOP;
-	private ArrayList<String> members;
+	private HashMap<String,RoomType> members;
+	private HashMap<String,String> nodes;
 
 
 
 	private ChordConnectionManager() {
-		members = new ArrayList<String>();
+		members = new HashMap<String,RoomType>();
+		nodes = new HashMap<String,String>();
 	}
 
 	public static ChordConnectionManager getInstance(){	
@@ -47,16 +51,16 @@ public class ChordConnectionManager{
 	private int mSelectedInterface = -1;
 	private WifiManager wifiManager;
 
+	
+	public HashMap<String,RoomType> getMembersRooms(){
+		return members;
+	}
+	
 	//Chord specific code, copied from BasicChordSample (Samsung Mobile SDK 1.0.3)
 	private static final String CHORD_HELLO_TEST_CHANNEL = "test channel"; //TODO: change to password of server
 	private Context ctx;
 
 	
-	public String[] getArrMembers(){
-		String[] arrMem = new String[members.size()]; 
-		members.toArray(arrMem);
-		return arrMem;
-	}
 
 	public void sendData(byte[][] payload, ChordMessageType type){
 		try{
@@ -67,27 +71,14 @@ public class ChordConnectionManager{
 		}
 	}
 
-
-	WifiChangeStateReceiver wcsReceiver;
 	public void initChord(final Context ctx) {
 		this.ctx = ctx;
 
 		chordState = ChordManagerState.WIFI_SCAN;
 
-		//turn on wifi auto
-		wifiManager = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
-
-
-		if(!wifiManager.isWifiEnabled()){
-			wifiManager.setWifiEnabled(true);/*
-			wcsReceiver = new WifiChangeStateReceiver(ctx);
-			ctx.registerReceiver(wcsReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));*/
-
-			//TODO: add wifi p2p network manager ? 
-		}else{
-			setupChord();
-
-		}
+		//TODO: manage wifi connection ? 
+		setupChord();
+	
 	}
 
 	private String getInterfaceName(int interfaceType) {
@@ -248,6 +239,8 @@ public class ChordConnectionManager{
 		}
 	};
 
+
+	
 	public void sendName(){
 
 		//send name of device
@@ -265,13 +258,18 @@ public class ChordConnectionManager{
 		channel = mChordManager.joinChannel(CHORD_HELLO_TEST_CHANNEL, mChannelListener);
 		chordState = ChordManagerState.RUNNING;
 		
-
+		
+		//adding current user
+		String nodeName = mChordManager.getName();
+		members.put(nodeName, RoomType.HOST);//add(BluetoothAdapter.getDefaultAdapter().getName());
+		nodes.put(nodeName,BluetoothAdapter.getDefaultAdapter().getName());
+		
+		
+		HostOptionsActivity.refreshMemberList(BluetoothAdapter.getDefaultAdapter().getName());
 		
 		if (channel == null) {
 			Log.d("coffeebean","ChordConnectionManager:"+"    Fail to joinChannel");
-		}else
-
-			sendName();
+		}
 	}
 
 	public void stopChord() {
@@ -283,7 +281,7 @@ public class ChordConnectionManager{
 
 		// If you registered NetworkListener, you should unregister it.
 
-		mChordManager.setNetworkListener(null);
+		mChordManager.setNetworkListener(null);   
 
 
 		// 7. Stop Chord. You can call leaveChannel explicitly.
@@ -309,7 +307,7 @@ public class ChordConnectionManager{
 		@Override
 		public void onNodeJoined(String fromNode, String fromChannel) {
 			Toast.makeText(ctx,fromNode+" has joined the "+fromChannel,Toast.LENGTH_SHORT).show();
-			
+			sendName();
 		}
 
 
@@ -319,12 +317,19 @@ public class ChordConnectionManager{
 
 
 			switch(ChordMessageType.getSyncType(payloadType)){
-			
-
+			case CHANGING_ROOM:
+				members.put(fromNode, RoomType.getRoomType(new String(payload[0])));				
+				HostOptionsActivity.changeIndicators();
+				
+				break;
 			case SENDING_NAME:
 				String name = new String(payload[0]);
-				if(!name.isEmpty() && !members.contains(name)){
-					members.add(name);
+				if(!name.isEmpty() && !members.containsKey(name)){
+					members.put(name, RoomType.HOST);
+					//members.add(name);
+					members.put(fromNode, RoomType.HOST);
+					nodes.put(fromNode,name);
+					
 					HostOptionsActivity.refreshMemberList(name);
 				}
 				break;
@@ -332,27 +337,34 @@ public class ChordConnectionManager{
 				
 			case MUSIC_PLAY:
 				Toast.makeText(ctx, "MUSIC!", Toast.LENGTH_SHORT).show();
-				MusicActivity.playMp3(payload[0]);
+				MusicActivity.setMp3Bytes(payload[0]);
 				break;
 			case SHOW_PICTURE:
-				Toast.makeText(ctx, "PICTURE!", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(ctx, "PICTURE!", Toast.LENGTH_SHORT).show();
 				Bitmap bmp = BitmapFactory.decodeByteArray(payload[0], 0, payload[0].length);
 				PictureActivity.setImage(bmp);
 				break;
 			case VIDEO_PLAY:
-				Toast.makeText(ctx, "VIDEO!", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(ctx, "VIDEO!", Toast.LENGTH_SHORT).show();
 				VideoActivity.playVideo(payload);
 				break;
 			case WHITEBOARD:
-				Toast.makeText(ctx, "WHITEBOARD!", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(ctx, "WHITEBOARD!", Toast.LENGTH_SHORT).show();
 				WhiteboardActivity.drawBoard(payload);
+				
 				break;
 			case SHOW_DOCUMENT:
+				break;
+				
+			case SHOW_SURVEY: 
+				SurveyActivity.saveMsg(payload[0]);
 				break;
 			default:
 				break;
 
 			}
+			
+			
 		}
 
 		//unused interface funcs

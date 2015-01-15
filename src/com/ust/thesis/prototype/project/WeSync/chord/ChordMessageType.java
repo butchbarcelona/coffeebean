@@ -3,10 +3,12 @@ package com.ust.thesis.prototype.project.WeSync.chord;
 public enum ChordMessageType {
 
 
-	SENDING_NAME("sending_name"),	
+	SENDING_NAME("sending_name"),
+	CHANGING_ROOM("changing_room"),	
 	
 	MUSIC_PLAY("music_player"),
 	VIDEO_PLAY("video_player"),
+	SHOW_SURVEY("show_survey"),
 	SHOW_PICTURE("show_picture"),
 	SHOW_DOCUMENT("show_document"),
 	WHITEBOARD("whiteboard"),

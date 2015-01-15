@@ -37,6 +37,7 @@ public class HomePageActivity extends Activity {
                 Intent insertPass = new Intent(getApplicationContext(),
                         InsertPasswordActivity.class);
                 startActivity(insertPass);
+                finish();
             }
         });
 
@@ -46,6 +47,7 @@ public class HomePageActivity extends Activity {
                 Intent createPass = new Intent(getApplicationContext(),
                         CreatePasswordActivity.class);
                 startActivity(createPass);
+                finish();
             }
         });
     }

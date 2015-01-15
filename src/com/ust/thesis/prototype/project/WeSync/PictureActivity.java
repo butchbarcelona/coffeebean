@@ -56,29 +56,29 @@ import android.widget.Toast;
 /**
  * Created by robertjordanebdalin on 8/28/14.
  */
-public class PictureActivity extends Activity {
+public class PictureActivity extends ChordActivity {
 	String nodename;
 	Button button1;
 	static ImageView imageView1;
 	String[] musicname;
 	String[] musicpath;
-	String mname="",mpath="";
+	String mname = "", mpath = "";
 	int chosen;
 	AlertDialog levelDialog;
-	int countfile=0;
-	
+	int countfile = 0;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.picture_activity);
-		button1 = (Button)findViewById(R.id.button1);
+		button1 = (Button) findViewById(R.id.button1);
 		imageView1 = (ImageView) findViewById(R.id.imageView1);
 
 		walkdir(Environment.getExternalStorageDirectory());
 
-		button1.setOnClickListener( new OnClickListener() {
+		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
@@ -86,73 +86,72 @@ public class PictureActivity extends Activity {
 				String[] tempname = mname.split("%%%%%%");
 				String[] temppath = mpath.split("%%%%%%");
 
-				musicname= new String [tempname.length-1];
-				musicpath= new String [tempname.length-1];
+				musicname = new String[tempname.length - 1];
+				musicpath = new String[tempname.length - 1];
 
-				for(int i = 0;i<tempname.length-1;i++){
-					musicname[i] = tempname[i+1];
-					musicpath[i] = temppath[i+1];
+				for (int i = 0; i < tempname.length - 1; i++) {
+					musicname[i] = tempname[i + 1];
+					musicpath[i] = temppath[i + 1];
 				}
 
-				if (tempname.length>1){
+				if (tempname.length > 1) {
 
-					// Creating and Building the Dialog 
-					AlertDialog.Builder builder = new AlertDialog.Builder(PictureActivity.this);
+					// Creating and Building the Dialog
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							PictureActivity.this);
 					builder.setTitle("Choose image file");
-					builder.setSingleChoiceItems(musicname, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							button1.setText(musicname[item]);
-							chosen = item;
-							levelDialog.dismiss();  
+					builder.setSingleChoiceItems(musicname, -1,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int item) {
+									button1.setText(musicname[item]);
+									chosen = item;
+									levelDialog.dismiss();
 
-							File imgFile = new  File(musicpath[item]);
+									File imgFile = new File(musicpath[item]);
 
+									Bitmap bmp = BitmapFactory
+											.decodeFile(imgFile
+													.getAbsolutePath());
+									ByteArrayOutputStream stream = new ByteArrayOutputStream();
+									bmp.compress(Bitmap.CompressFormat.PNG,
+											100, stream);
+									byte[] byteArray = stream.toByteArray();
 
-							Bitmap bmp= BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-							ByteArrayOutputStream stream = new ByteArrayOutputStream();
-							bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-							byte[] byteArray = stream.toByteArray();
+									imageView1.setImageBitmap(bmp);
 
-							imageView1.setImageBitmap(bmp);
+									byte[][] payload = new byte[1][];
+									payload[0] = byteArray;
 
-							byte[][] payload = new byte[1][];
-							payload[0] = byteArray;
+									bmpMsg = bmp;
+									
+									ChordConnectionManager
+											.getInstance()
+											.sendData(
+													payload,
+													ChordMessageType.SHOW_PICTURE);
 
-							/* SchordChannel channel = mChordManager.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
-    			            	        channel.sendDataToAll(CHORD_SAMPLE_MESSAGE_TYPE, payload);*/
-
-
-    			            	        //TODO: chord
-    			            	        ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.SHOW_PICTURE);
-
-						}
-					});
+								}
+							});
 					levelDialog = builder.create();
 					levelDialog.show();
 
-				}else {
-					Toast.makeText(PictureActivity.this,"NO MUSIC FOUND",
+				} else {
+					Toast.makeText(PictureActivity.this, "NO MUSIC FOUND",
 							Toast.LENGTH_SHORT).show();
 				}
 
-
-
-
-
-
-			}});
+			}
+		});
 
 	}
-
 
 	@Override
-	public void onBackPressed()
-	{
+	public void onBackPressed() {
 		// code here to show dialog
-		super.onBackPressed();  
+		super.onBackPressed();
 		finish();
 	}
-
 
 	public void walkdir(File dir) {
 
@@ -165,16 +164,17 @@ public class PictureActivity extends Activity {
 
 				if (listFile[i].isDirectory()) {
 					walkdir(listFile[i]);
-					//textView1.setText("Directory: "+listFile[i]);
+					// textView1.setText("Directory: "+listFile[i]);
 				} else {
-					if (listFile[i].getName().endsWith(pdfPattern)){
-						//Do what ever u want
-						mname = mname+"%%%%%%"+listFile[i].getName();
-						mpath = mpath+"%%%%%%"+listFile[i].getPath();
+					if (listFile[i].getName().endsWith(pdfPattern)) {
+						// Do what ever u want
+						mname = mname + "%%%%%%" + listFile[i].getName();
+						mpath = mpath + "%%%%%%" + listFile[i].getPath();
 						System.out.println(mname);
 						System.out.println(mpath);
-						System.out.println("Found : "+listFile[i].getName());
-						System.out.println("Found path : "+listFile[i].getPath());
+						System.out.println("Found : " + listFile[i].getName());
+						System.out.println("Found path : "
+								+ listFile[i].getPath());
 
 					}
 				}
@@ -183,14 +183,25 @@ public class PictureActivity extends Activity {
 
 	}
 
+	static Bitmap bmpMsg = null;
 
-
-
-	public static void setImage(Bitmap bmp){
-
-		imageView1.setImageBitmap(bmp);
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+	
+		if(bmpMsg != null) {
+			imageView1.setImageBitmap(bmpMsg);
+		}
 	}
-
-
+	
+	public static void setImage(Bitmap bmp) {
+		if (PictureActivity.isRunning()) {
+			imageView1.setImageBitmap(bmp);
+			bmpMsg = null;
+		} else{
+			bmpMsg = bmp;
+		}
+	}
 
 }

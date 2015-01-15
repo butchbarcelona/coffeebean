@@ -64,7 +64,7 @@ public class InsertPasswordActivity extends Activity {
             	Global.setPlayerName(player.getText().toString());
                 Intent shareHost = new Intent (getApplicationContext(), HostOptionsActivity.class);
                startActivity(shareHost);
-                
+                finish();
             }
         });
 

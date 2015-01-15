@@ -72,42 +72,43 @@ import android.widget.VideoView;
 /**
  * Created by robertjordanebdalin on 8/28/14.
  */
-public class VideoActivity extends Activity {
+public class VideoActivity extends ChordActivity {
 	Button button1;
 	static VideoView mVideoView;
 	ImageView playmusic;
 	String[] musicname;
 	String[] musicpath;
-	String mname="",mpath="";
+	String mname = "", mpath = "";
 	int chosen;
 	AlertDialog levelDialog;
-	int countfile=0;
+	int countfile = 0;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.video_activity);
 
-		mVideoView = (VideoView)findViewById(R.id.videoview);
-		button1 = (Button)findViewById(R.id.button1);
-		playmusic = (ImageView)findViewById(R.id.playmusic);
-
+		mVideoView = (VideoView) findViewById(R.id.videoview);
+		button1 = (Button) findViewById(R.id.button1);
+		playmusic = (ImageView) findViewById(R.id.playmusic);
 
 		walkdir(Environment.getExternalStorageDirectory());
 
-		playmusic.setOnClickListener( new OnClickListener() {
+		playmusic.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
-				if (!(button1.getText().equals("Select Video"))){
+				if (!(button1.getText().equals("Select Video"))) {
 					// Play audio
 					File file = new File(musicpath[chosen]);
 					String SrcPath = (musicpath[chosen]);
-					if (file.exists())System.out.println("exist");
-					else System.out.println("do not exist : "+musicpath[chosen]);
-
+					if (file.exists())
+						System.out.println("exist");
+					else
+						System.out.println("do not exist : "
+								+ musicpath[chosen]);
 
 					mVideoView.setVideoPath(SrcPath);
 					mVideoView.requestFocus();
@@ -120,73 +121,79 @@ public class VideoActivity extends Activity {
 						byte[] temp = new byte[1024];
 						int read;
 
-						while((read = is.read(temp)) >= 0){
+						while ((read = is.read(temp)) >= 0) {
 							buffer.write(temp, 0, read);
 						}
-						is.close();        
+						is.close();
 						byte[] data = buffer.toByteArray();
 
 						byte[][] payload = new byte[1][];
 						payload[0] = data;
+						
+						byteArrayMsg = data;
 
-						/*SchordChannel channel = mChordManager.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
-	            	        channel.sendDataToAll(CHORD_SAMPLE_MESSAGE_TYPE, payload);*/
-
-	            	        ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.VIDEO_PLAY);
-
+						ChordConnectionManager.getInstance().sendData(payload,
+								ChordMessageType.VIDEO_PLAY);
 
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
-						System.out.println("Error : "+e);
+						System.out.println("Error : " + e);
 						e.printStackTrace();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						System.out.println("Error 1: "+e);
+						System.out.println("Error 1: " + e);
 					}
 
-				}else Toast.makeText(VideoActivity.this,"NO VIDEO SELECTED",Toast.LENGTH_SHORT).show();
+				} else
+					Toast.makeText(VideoActivity.this, "NO VIDEO SELECTED",
+							Toast.LENGTH_SHORT).show();
 
-			}});
+			}
+		});
 
-		button1.setOnClickListener( new OnClickListener() {
+		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
 
-
 				String[] tempname = mname.split("%%%%%%");
 				String[] temppath = mpath.split("%%%%%%");
 
-				musicname= new String [tempname.length-1];
-				musicpath= new String [tempname.length-1];
+				musicname = new String[tempname.length - 1];
+				musicpath = new String[tempname.length - 1];
 
-				for(int i = 0;i<tempname.length-1;i++){
-					musicname[i] = tempname[i+1];
-					musicpath[i] = temppath[i+1];
+				for (int i = 0; i < tempname.length - 1; i++) {
+					musicname[i] = tempname[i + 1];
+					musicpath[i] = temppath[i + 1];
 				}
 
-				if (tempname.length>1){
+				if (tempname.length > 1) {
 
-					// Creating and Building the Dialog 
-					AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
+					// Creating and Building the Dialog
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							VideoActivity.this);
 					builder.setTitle("Choose video file");
-					builder.setSingleChoiceItems(musicname, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							button1.setText(musicname[item]+"");
-							chosen = item;
-							levelDialog.dismiss();    
-						}
-					});
+					builder.setSingleChoiceItems(musicname, -1,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int item) {
+									button1.setText(musicname[item] + "");
+									chosen = item;
+									levelDialog.dismiss();
+								}
+							});
 					levelDialog = builder.create();
 					levelDialog.show();
 
-				}else {
-					Toast.makeText(VideoActivity.this,"NO VIDEO FOUND",
+				} else {
+					Toast.makeText(VideoActivity.this, "NO VIDEO FOUND",
 							Toast.LENGTH_SHORT).show();
 				}
-			}});
+			}
+		});
 
+		
 	}
 
 	public void walkdir(File dir) {
@@ -200,46 +207,51 @@ public class VideoActivity extends Activity {
 
 				if (listFile[i].isDirectory()) {
 					walkdir(listFile[i]);
-					//textView1.setText("Directory: "+listFile[i]);
+					// textView1.setText("Directory: "+listFile[i]);
 				} else {
-					if (listFile[i].getName().endsWith(pdfPattern)){
-						//Do what ever u want
-						mname = mname+"%%%%%%"+listFile[i].getName();
-						mpath = mpath+"%%%%%%"+listFile[i].getPath();
+					if (listFile[i].getName().endsWith(pdfPattern)) {
+						// Do what ever u want
+						mname = mname + "%%%%%%" + listFile[i].getName();
+						mpath = mpath + "%%%%%%" + listFile[i].getPath();
 						System.out.println(mname);
 						System.out.println(mpath);
-						System.out.println("Found : "+listFile[i].getName());
-						System.out.println("Found path : "+listFile[i].getPath());
+						System.out.println("Found : " + listFile[i].getName());
+						System.out.println("Found path : "
+								+ listFile[i].getPath());
 
 					}
 				}
 			}
 		}
 
-
-
-
 	}
 
-
-
-
 	@Override
-	public void onBackPressed()
-	{
+	public void onBackPressed() {
 		// code here to show dialog
-		super.onBackPressed();  
+		super.onBackPressed();
 		finish();
 	}
 
+	static byte[] byteArrayMsg;
 
-	public static void playVideo(byte[][] payload){
-		byte[] byteArray = payload[0];
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		
+		if(byteArrayMsg != null){
+			showVideo(byteArrayMsg);
+		}
+	}
+	
+	public static void showVideo(byte[] byteArray){
 
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/temp.mp4";
+		String path = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Android/temp.mp4";
 
 		File file = new File(path);
-		//"/sdcard/SHELLA2.mp4");
+		// "/sdcard/SHELLA2.mp4");
 		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream(file);
@@ -252,13 +264,20 @@ public class VideoActivity extends Activity {
 			// handle exception
 		}
 
-		//String SrcPath = path;//"/sdcard/SHELLA2.mp4";
+		// String SrcPath = path;//"/sdcard/SHELLA2.mp4";
 		mVideoView.setVideoPath(path);
 		mVideoView.requestFocus();
 		mVideoView.start();
 	}
+	
+	
+	public static void playVideo(byte[][] payload) {
 
-
-
+		if (VideoActivity.isRunning()) {
+			byteArrayMsg = null;
+			showVideo(payload[0]);
+		} else
+			byteArrayMsg = payload[0];
+	}
 
 }

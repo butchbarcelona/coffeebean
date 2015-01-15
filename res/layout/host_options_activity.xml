@@ -26,61 +26,138 @@
                 android:layout_marginTop="20dp"
                 android:src="@drawable/collaboard3" />
 
-            <Button
-                android:id="@+id/whiteboard"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_wb_button"
-                android:gravity="center"
-                android:paddingLeft="0dp"
-                android:text="Whiteboard" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
-            <Button
-                android:id="@+id/picture"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_picture_button"
-                android:gravity="center"
-                android:paddingLeft="20dp"
-                android:text="Share Picture" />
+                <Button
+                    android:id="@+id/whiteboard"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_wb_button"
+                    android:gravity="center"
+                    android:paddingLeft="0dp"
+                    android:text="Whiteboard" />
 
-            <Button
-                android:id="@+id/video"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_video_button"
-                android:gravity="center"
-                android:paddingLeft="10dp"
-                android:text="Share Video" />
+                <TextView
+                    android:id="@+id/whiteboard_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/whiteboard"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
 
-            <Button
-                android:id="@+id/document"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_doc_button"
-                android:gravity="center"
-                android:paddingLeft="60dp"
-                android:text="Share Document" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
-            <Button
-                android:id="@+id/music"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_music_button"
-                android:gravity="center"
-                android:paddingLeft="18dp"
-                android:text="Share Music" />
+                <Button
+                    android:id="@+id/picture"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_picture_button"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:text="Share Picture" />
 
-            <Button
-                android:id="@+id/survey"
-                style="@style/ButtonText"
-                android:background="@drawable/layer_createsurvey_button"
-                android:gravity="center"
-                android:paddingLeft="30dp"
-                android:text="Create Survey" />
+                <TextView
+                    android:id="@+id/picture_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/picture"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/video"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_video_button"
+                    android:gravity="center"
+                    android:paddingLeft="10dp"
+                    android:text="Share Video" />
+
+                <TextView
+                    android:id="@+id/video_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/video"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/document"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_doc_button"
+                    android:gravity="center"
+                    android:paddingLeft="60dp"
+                    android:text="Share Document" />
+
+                <TextView
+                    android:id="@+id/document_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/document"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/music"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_music_button"
+                    android:gravity="center"
+                    android:paddingLeft="18dp"
+                    android:text="Share Music" />
+
+                <TextView
+                    android:id="@+id/music_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/music"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/survey"
+                    style="@style/ButtonText"
+                    android:background="@drawable/layer_createsurvey_button"
+                    android:gravity="center"
+                    android:paddingLeft="30dp"
+                    android:text="Create Survey" />
+
+                <TextView
+                    android:id="@+id/survey_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/survey"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
         </LinearLayout>
-<!-- 
-        <Button
-            android:id="@+id/btn_members"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="Members" /> -->
     </FrameLayout>
     <!-- The navigation drawer -->
 
@@ -89,9 +166,9 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#111"
+        android:background="#FFFFFF"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
+        android:divider="@android:color/background_light"
         android:dividerHeight="0dp" />
 
 </android.support.v4.widget.DrawerLayout>

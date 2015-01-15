@@ -51,6 +51,7 @@ public class CreatePasswordActivity extends Activity {
             	
                 Intent shareHost = new Intent (getApplicationContext(), HostOptionsActivity.class);
                 startActivity(shareHost);
+                finish();
             }
         });
 
