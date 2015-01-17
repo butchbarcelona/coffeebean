@@ -1,6 +1,9 @@
 package com.ust.thesis.prototype.project.WeSync;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.ust.thesis.prototype.project.WeSync.chord.ColorPoint;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,33 +25,25 @@ public class DrawPanel extends View {
 	private Paint paint2;
 	String penColor;
 	private boolean erase=false;
-	private ArrayList points;
-	private ArrayList strokes;
-	private ArrayList<String> colors;
-	private ArrayList<ArrayList<String>> colorsStrokes;
-	
-	private ArrayList points2;
-	private ArrayList strokes2;
-	private ArrayList<String> colors2;
-	private ArrayList<ArrayList<String>> colorsStrokes2;
-	
+	private HashMap<String, ArrayList<ColorPoint>> pts2;
+	/*private HashMap<String, ArrayList<ArrayList<ColorPoint>>> strks2;*/
+	private ArrayList<ColorPoint> pts;
+	private static ArrayList<ArrayList<ColorPoint>> strks;
+
 	public DrawPanel(Context context) {
 		super(context);
-		points = new ArrayList();
-		strokes = new ArrayList();
-		colors = new ArrayList<String>();
-		colorsStrokes = new ArrayList<ArrayList<String>>();
+		pts2 = new HashMap<String, ArrayList<ColorPoint>>();
+		/*strks2 = new HashMap<String, ArrayList<ArrayList<ColorPoint>>>();
+		 */
+		pts = new ArrayList<ColorPoint>();
 		
-		
-		
-		points2 = new ArrayList();
-		strokes2 = new ArrayList();
-		colors2 = new ArrayList<String>();
-		colorsStrokes2 = new ArrayList<ArrayList<String>>();
-		
+		if(strks == null)
+			strks = new ArrayList<ArrayList<ColorPoint>>();
+
 		paint = createPaint(Color.BLACK, 8);
 		paint2 = createPaint(Color.BLACK, 8);
 		System.out.println("Draw Panel");
+
 	}
 
 	@Override
@@ -57,134 +52,138 @@ public class DrawPanel extends View {
 		this.setBackgroundColor(Color.WHITE);
 
 		System.out.println("on Draw");
-		int count = 0;
-		for(Object obj: strokes){
-			drawStroke((ArrayList)obj,colorsStrokes.get(count), c);
-			count++;
-		}
-		drawStroke(points, colors, c); //draws current 
 
-		count = 0;
-		for(Object obj: strokes2){
-			drawStroke2((ArrayList)obj, colorsStrokes2.get(count), c);
-			count++;
+		for(ArrayList<ColorPoint> strokes: strks){
+			drawStroke2( strokes, c);
 		}
-		drawStroke2(points2,colors2, c);
+
+
+
+		/*for(String key: strks2.keySet()){
+
+			for(ArrayList<ColorPoint> strokes: strks2.get(key)){
+				drawStroke2(strokes, c);
+			}
+		}*/
+
+		for(String key: pts2.keySet()){ 
+			drawStroke2(pts2.get(key), c);
+		}
+
+		drawStroke2(pts, c); //draws current 
+
 	}
 
 
-	public void DrawFromOther(String pen,double x, double y){
+	public void DrawFromOther(String fromNode, String pen,double x, double y){
+
+
+
 		System.out.println("Pen Color : "+pen);
 		penColor = pen;
 		int xint = (int) x;
-		int yint = (int) y;
-		colors2.add(pen);
-		points2.add(new Point(xint, yint));
+		int yint = (int) y; 
+
+		ArrayList<ColorPoint> tempColorPts = pts2.get(fromNode) ;
+		if(tempColorPts == null)
+			tempColorPts = new ArrayList<ColorPoint>(); 
+
+		tempColorPts.add(new ColorPoint(fromNode, new Point(xint, yint),pen));
+		pts2.put(fromNode, tempColorPts);
+
 		invalidate();  
 	}
-	public void EndDrawFromOther(){
-		String penColor = Global.getColor()+"";
-		this.strokes2.add(points2);
-		points2 = new ArrayList();  
-		this.colorsStrokes2.add(colors2); 
-		colors2 = new ArrayList<String>();
+
+	public void EndDrawFromOther(String fromNode){
+
+		/*ArrayList<ColorPoint> tempColorPts = pts2.get(fromNode);
+		ArrayList<ArrayList<ColorPoint>> tempStrokes = strks2.get(fromNode);
+
+		if(tempStrokes == null)
+			tempStrokes = new ArrayList<ArrayList<ColorPoint>>() ;
+
+		tempStrokes.add((ArrayList<ColorPoint>) tempColorPts.clone());
+
+		strks2.put(fromNode,tempStrokes);*//*
+		ArrayList<ArrayList<ColorPoint>> tempStrokes = strks.get(fromNode);
+
+		if(tempStrokes == null)
+			tempStrokes = new ArrayList<ArrayList<ColorPoint>>() ;*/
+
+		//tempStrokes.add((ArrayList<ColorPoint>) tempColorPts.clone());
+
+		
+		strks.add((ArrayList<ColorPoint>) pts2.get(fromNode).clone());
+		pts2.get(fromNode).clear();
 	}
 
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event){
-		if(event.getActionMasked() == MotionEvent.ACTION_MOVE){
-			colors.add(Global.getColor());
-			points.add(new Point((int)event.getX(), (int)event.getY()));	
+		if(event.getActionMasked() == MotionEvent.ACTION_MOVE){			
+			
+			pts.add(new ColorPoint(new Point((int)event.getX(), (int)event.getY()), Global.getColor()));			
 			invalidate();
 		}
 
 		if(event.getActionMasked() == MotionEvent.ACTION_UP){
-			this.strokes.add(points);
-			
-			this.colorsStrokes.add(colors);
-			points = new ArrayList();
-			colors = new ArrayList<String>();
+			strks.add((ArrayList<ColorPoint>)pts.clone());
+			pts.clear();
 		}
 
 		return true;
 	}
 
 
-
-	private void drawStroke(ArrayList strokes, ArrayList colors, Canvas c){
-
-		System.out.println("draw Stroke ");
-		
-		String globalPen = "Black";
-		
-		if (strokes.size() > 0) {
-			Point p0 = (Point)strokes.get(0);
-			for (int i = 1; i < strokes.size(); i++) {
-				//"Red","Magenta","Yellow", "Green", "Blue","Cyan"};
-				//String globalPen = Global.getColor()+"";
-				
-				if(colors.size() > i)
-					globalPen = (String) colors.get(i);
-				
-				if(globalPen.equals("Red")) paint = createPaint(Color.RED , 8);
-				else if(globalPen.equals("Magenta")) paint = createPaint(Color.MAGENTA , 8);
-				else if(globalPen.equals("Yellow")) paint = createPaint(Color.YELLOW , 8);
-				else if(globalPen.equals("Green")) paint = createPaint(Color.GREEN, 8);
-				else if(globalPen.equals("Blue")) paint = createPaint(Color.BLUE , 8);
-				else if(globalPen.equals("Cyan")) paint = createPaint(Color.CYAN , 8);
-				else if(globalPen.equals("White")) paint = createPaint(Color.WHITE , 8);
-				else if(globalPen.equals("Black")) paint = createPaint(Color.BLACK , 8);
-				
-				Point p1 = (Point)strokes.get(i); 
-				
-				c.drawLine(p0.x, p0.y, p1.x, p1.y, paint);
-				p0 = p1;
-			}
-		}
-		colors = new ArrayList();
-		strokes = new ArrayList();
-	}
-
-
-	private void drawStroke2(ArrayList strokes2, ArrayList colors2, Canvas c){
+	private void drawStroke2(ArrayList<ColorPoint> nodeStrokes, Canvas c){
 		System.out.println("Pen Color Strokes: "+penColor);
-		if (strokes2.size() > 0) {
-			Point p0 = (Point)strokes2.get(0);
-			for (int i = 1; i < strokes2.size(); i++) {
 
+		String pastPenColor = "Black";
+		Paint nodePaint = null;
 
-				if(colors2.size() > i)
-					penColor = (String) colors2.get(i);
-				
-				if(penColor.equals("Red")) paint2 = createPaint(Color.RED , 8);
-				else if(penColor.equals("Magenta")) paint2 = createPaint(Color.MAGENTA , 8);
-				else if(penColor.equals("Yellow")) paint2 = createPaint(Color.YELLOW , 8);
-				else if(penColor.equals("Green")) paint2 = createPaint(Color.GREEN, 8);
-				else if(penColor.equals("Blue")) paint2 = createPaint(Color.BLUE , 8);
-				else if(penColor.equals("Cyan")) paint2 = createPaint(Color.CYAN , 8);
-				else if(penColor.equals("White")) paint2 = createPaint(Color.WHITE , 8);
-				else paint2 = createPaint(Color.BLACK , 8);
+		if (nodeStrokes.size() > 0) {			
+			Point p0 = (Point)nodeStrokes.get(0).pt;
+			for (int i = 1; i < nodeStrokes.size(); i++) {
+				penColor = nodeStrokes.get(i).color;
 
-				Point p1 = (Point)strokes2.get(i); 
-				c.drawLine(p0.x, p0.y, p1.x, p1.y, paint2);
+				if(penColor != pastPenColor || nodePaint == null){
+					nodePaint = createPaint(penColor);
+					pastPenColor = penColor;
+				}
+
+				Point p1 =  (Point)nodeStrokes.get(i).pt;
+				c.drawLine(p0.x, p0.y, p1.x, p1.y, nodePaint);
 				p0 = p1;
 			}
-		}
-
-		colors2 = new ArrayList();
-		strokes2 = new ArrayList();
+		} 
 	}
+
+
+
 
 	public void setErase(boolean isErase){
 		erase=isErase;
-		if(erase) paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		Global.setColor("White");   
+		/*		if(erase) paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 		//paint2.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));}
 		else paint.setXfermode(null);
 		//paint2.setXfermode(null);}
+		 */	}
+
+
+	private Paint createPaint(String penColor){
+		if(penColor.equals("Red")) return createPaint(Color.RED , 8);
+		else if(penColor.equals("Magenta")) return createPaint(Color.MAGENTA , 8);
+		else if(penColor.equals("Yellow")) return createPaint(Color.YELLOW , 8);
+		else if(penColor.equals("Green")) return createPaint(Color.GREEN, 8);
+		else if(penColor.equals("Blue")) return createPaint(Color.BLUE , 8);
+		else if(penColor.equals("Cyan")) return createPaint(Color.CYAN , 8);
+		else if(penColor.equals("White")) return createPaint(Color.WHITE , 15);
+		else return createPaint(Color.BLACK , 8);
 	}
 
 	private Paint createPaint(int color, float width){
+
 		Paint temp = new Paint();
 		temp.setStyle(Paint.Style.STROKE);
 		temp.setAntiAlias(true);

@@ -28,13 +28,6 @@
             android:src="@drawable/settings" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" >
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,12 +36,13 @@
         android:orientation="vertical" >
 
         <EditText
+            android:layout_marginTop="30dp"
             android:id="@+id/question"
             android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ems="10"
-			android:gravity="center"
+            android:gravity="center"
             android:hint="Type a question" />
 
         <LinearLayout
@@ -64,10 +58,7 @@
                 android:focusable="false"
                 android:gravity="center"
                 android:textColor="#000000" />
-
-            
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -120,42 +111,84 @@
         <ListView
             android:id="@+id/listView_items"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" 
-            android:background="#ffffff">
+            android:layout_height="wrap_content"
+            android:background="#ffffff" >
         </ListView>
-
     </LinearLayout>
-
-    <LinearLayout
+ <LinearLayout
+     
+     	android:id="@+id/answerSurveyButtons"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingBottom="10dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="10dp" >
 
-        <Button
-            android:id="@+id/addPolls"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:text="Add Polls"
-            style="@style/ButtonText4"
-            android:background="@drawable/btn_bluegreen2"
-            android:layout_marginRight="5dp"  />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+        android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/nextQuestion"
+                style="@style/ButtonText4"
+                android:layout_width="wrap_content"
+                android:layout_height="37dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/btn_pink2"
+                android:text="Next Question" />
+        </LinearLayout>
+    </LinearLayout>
+    
+    
+    <LinearLayout
+     	android:id="@+id/createSurveyButtons"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="10dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+        android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/addPolls"
+                style="@style/ButtonText4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_bluegreen2"
+                android:text="Add Polls" />
+
+            <Button
+                android:id="@+id/broadcast"
+                style="@style/ButtonText4"
+                android:layout_width="wrap_content"
+                android:layout_height="37dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/btn_pink2"
+                android:text="Broadcast" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/broadcast"
-            android:layout_width="0dp"
+            android:id="@+id/addNewQuestion"
+            style="@style/ButtonText4"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:text="Broadcast"
-            style="@style/ButtonText4"
-            android:background="@drawable/btn_pink2" />
+            android:background="@drawable/btn_bluegreen2"
+            android:text="Add Question" />
     </LinearLayout>
 
 </LinearLayout>

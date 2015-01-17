@@ -93,29 +93,12 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 		HashMap<String, RoomType> memberRooms = ChordConnectionManager
 				.getInstance().getMembersRooms();
 		for (RoomType type : RoomType.values()) {
-
 			changeIndicator(type, 0);
-
 		}
 
 		for (String key : memberRooms.keySet()) { 
 			changeIndicator(memberRooms.get(key), 1);
 		}
-		
-		
-		
-		/*Iterator it = memberRooms.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			
-			
-			System.out.println(pairs.getKey() + " = " + pairs.getValue());
-			
-			
-			changeIndicator(pairs.getValue(), 1);
-			it.remove(); // avoids a ConcurrentModificationException
-		}*/
-
 	}
 
 	public static void changeIndicator(RoomType type, int members) {
@@ -146,15 +129,22 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	public static void refreshMemberList(String member) {
+	public static void addMemberToList(String member) {
 
-		drawerListAdapter.clear();
+		//drawerListAdapter.clear();
 		/*
 		 * drawerListAdapter.addAll(ChordConnectionManager.getInstance()
 		 * .getArrMembers());
 		 */
 
+		
+		
 		drawerListAdapter.add(member);
+		drawerListAdapter.notifyDataSetChanged();
+	}
+	public static void removeMemberFromList(String member) {
+
+		drawerListAdapter.remove(member);
 		drawerListAdapter.notifyDataSetChanged();
 	}
 

@@ -1,21 +1,5 @@
 package com.ust.thesis.prototype.project.WeSync;
 
-import android.app.Activity;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
-import android.app.Activity;
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.Window;
-import android.view.WindowManager;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,51 +7,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
-import com.samsung.android.sdk.SsdkUnsupportedException;
-import com.samsung.android.sdk.chord.InvalidInterfaceException;
-import com.samsung.android.sdk.chord.Schord;
-import com.samsung.android.sdk.chord.SchordChannel;
-import com.samsung.android.sdk.chord.SchordManager;
-import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
-import com.ust.thesis.prototype.project.WeSync.ExplorerChordMessage.MessageType;
-import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
-import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Paint.Cap;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.Display;
-import android.view.MotionEvent;
+import android.os.Environment;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
 /**
  * Created by robertjordanebdalin on 8/28/14.
@@ -91,66 +49,32 @@ public class VideoActivity extends ChordActivity {
 		setContentView(R.layout.video_activity);
 
 		mVideoView = (VideoView) findViewById(R.id.videoview);
+
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		
+		MediaController mVidCtrlr = new MediaController(this);
+		mVidCtrlr.setAnchorView(mVideoView);
+		mVideoView.setMediaController(mVidCtrlr);
+		
+		
 		button1 = (Button) findViewById(R.id.button1);
-		playmusic = (ImageView) findViewById(R.id.playmusic);
+		/*playmusic = (ImageView) findViewById(R.id.playmusic);*/
 
 		walkdir(Environment.getExternalStorageDirectory());
 
-		playmusic.setOnClickListener(new OnClickListener() {
+		/*playmusic.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
 				if (!(button1.getText().equals("Select Video"))) {
-					// Play audio
-					File file = new File(musicpath[chosen]);
-					String SrcPath = (musicpath[chosen]);
-					if (file.exists())
-						System.out.println("exist");
-					else
-						System.out.println("do not exist : "
-								+ musicpath[chosen]);
-
-					mVideoView.setVideoPath(SrcPath);
-					mVideoView.requestFocus();
-					mVideoView.start();
-
-					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-					try {
-
-						InputStream is = new FileInputStream(file);
-						byte[] temp = new byte[1024];
-						int read;
-
-						while ((read = is.read(temp)) >= 0) {
-							buffer.write(temp, 0, read);
-						}
-						is.close();
-						byte[] data = buffer.toByteArray();
-
-						byte[][] payload = new byte[1][];
-						payload[0] = data;
-						
-						byteArrayMsg = data;
-
-						ChordConnectionManager.getInstance().sendData(payload,
-								ChordMessageType.VIDEO_PLAY);
-
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						System.out.println("Error : " + e);
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.out.println("Error 1: " + e);
-					}
+					
 
 				} else
 					Toast.makeText(VideoActivity.this, "NO VIDEO SELECTED",
 							Toast.LENGTH_SHORT).show();
 
 			}
-		});
+		});*/
 
 		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
@@ -181,10 +105,12 @@ public class VideoActivity extends ChordActivity {
 									button1.setText(musicname[item] + "");
 									chosen = item;
 									levelDialog.dismiss();
+									playSelectedVid();
 								}
 							});
 					levelDialog = builder.create();
 					levelDialog.show();
+					
 
 				} else {
 					Toast.makeText(VideoActivity.this, "NO VIDEO FOUND",
@@ -194,6 +120,55 @@ public class VideoActivity extends ChordActivity {
 		});
 
 		
+	}
+	
+	public void playSelectedVid(){
+		// Play audio
+		File file = new File(musicpath[chosen]);
+		String SrcPath = (musicpath[chosen]);
+		if (file.exists())
+			System.out.println("exist");
+		else
+			System.out.println("do not exist : "
+					+ musicpath[chosen]);
+
+		mVideoView.setVideoPath(SrcPath);
+		
+		
+		mVideoView.requestFocus();
+		mVideoView.start();
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try {
+
+			InputStream is = new FileInputStream(file);
+			byte[] temp = new byte[1024];
+			int read;
+
+			while ((read = is.read(temp)) >= 0) {
+				buffer.write(temp, 0, read);
+			}
+			is.close();
+			byte[] data = buffer.toByteArray();
+
+			byte[][] payload = new byte[1][];
+			payload[0] = data;
+			
+			byteArrayMsg = data;
+
+			ChordConnectionManager.getInstance().sendData(payload,
+					ChordMessageType.VIDEO_PLAY);
+			
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Error : " + e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Error 1: " + e);
+		}
 	}
 
 	public void walkdir(File dir) {

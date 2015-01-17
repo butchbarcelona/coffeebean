@@ -12,11 +12,16 @@
         android:background="@drawable/btn_bluegreen"
         android:text="Select Document" />
 
-    <ImageView
+  <!--   <ImageView
         android:id="@+id/imageView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerInside"
-        android:src="@drawable/picture" />
+        android:src="@drawable/picture" /> -->
+    
+    <WebView
+            android:id="@+id/webView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
 </LinearLayout>

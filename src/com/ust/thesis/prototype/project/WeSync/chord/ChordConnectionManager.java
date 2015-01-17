@@ -19,6 +19,7 @@ import com.samsung.android.sdk.chord.Schord;
 import com.samsung.android.sdk.chord.SchordChannel;
 import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
+import com.ust.thesis.prototype.project.WeSync.DocumentActivity;
 import com.ust.thesis.prototype.project.WeSync.HostOptionsActivity;
 import com.ust.thesis.prototype.project.WeSync.MusicActivity;
 import com.ust.thesis.prototype.project.WeSync.PictureActivity;
@@ -54,6 +55,9 @@ public class ChordConnectionManager{
 	
 	public HashMap<String,RoomType> getMembersRooms(){
 		return members;
+	}
+	public String[] getMembersNames(){
+		return (String[])nodes.entrySet().toArray();
 	}
 	
 	//Chord specific code, copied from BasicChordSample (Samsung Mobile SDK 1.0.3)
@@ -265,7 +269,7 @@ public class ChordConnectionManager{
 		nodes.put(nodeName,BluetoothAdapter.getDefaultAdapter().getName());
 		
 		
-		HostOptionsActivity.refreshMemberList(BluetoothAdapter.getDefaultAdapter().getName());
+		HostOptionsActivity.addMemberToList(BluetoothAdapter.getDefaultAdapter().getName());
 		
 		if (channel == null) {
 			Log.d("coffeebean","ChordConnectionManager:"+"    Fail to joinChannel");
@@ -301,6 +305,7 @@ public class ChordConnectionManager{
 		@Override
 		public void onNodeLeft(String fromNode, String fromChannel) {
 			Toast.makeText(ctx,fromNode+" has left the "+fromChannel,Toast.LENGTH_SHORT).show();
+			HostOptionsActivity.removeMemberFromList(nodes.get(fromNode));
 		}
 
 		//Called when a node join event is raised on the channel
@@ -310,7 +315,7 @@ public class ChordConnectionManager{
 			sendName();
 		}
 
-
+	
 		@Override
 		public void onDataReceived(String fromNode, String fromChannel, String payloadType,
 				byte[][] payload) {
@@ -324,13 +329,10 @@ public class ChordConnectionManager{
 				break;
 			case SENDING_NAME:
 				String name = new String(payload[0]);
-				if(!name.isEmpty() && !members.containsKey(name)){
-					members.put(name, RoomType.HOST);
-					//members.add(name);
+				if(!name.isEmpty() && !members.containsKey(fromNode)){
 					members.put(fromNode, RoomType.HOST);
 					nodes.put(fromNode,name);
-					
-					HostOptionsActivity.refreshMemberList(name);
+					HostOptionsActivity.addMemberToList(name);
 				}
 				break;
 				
@@ -350,10 +352,14 @@ public class ChordConnectionManager{
 				break;
 			case WHITEBOARD:
 				//Toast.makeText(ctx, "WHITEBOARD!", Toast.LENGTH_SHORT).show();
-				WhiteboardActivity.drawBoard(payload);
+				WhiteboardActivity.drawBoard(fromNode, payload);
 				
 				break;
 			case SHOW_DOCUMENT:
+
+				Toast.makeText(ctx, "DOCUMENT!", Toast.LENGTH_SHORT).show();
+				DocumentActivity.pdfLoadImages(ctx,payload[0]);
+				
 				break;
 				
 			case SHOW_SURVEY: 
