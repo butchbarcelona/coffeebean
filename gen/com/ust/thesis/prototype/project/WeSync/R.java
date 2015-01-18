@@ -104,15 +104,16 @@ public final class R {
         public static final int zoom_out=0x7f020047;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a004e;
+        public static final int action_settings=0x7f0a0054;
         public static final int addNewQuestion=0x7f0a0046;
         public static final int addPolls=0x7f0a0044;
+        public static final int allSurvey=0x7f0a003a;
         public static final int answerSurveyButtons=0x7f0a0041;
         public static final int broadcast=0x7f0a0045;
         public static final int btExit=0x7f0a0038;
         public static final int btOK=0x7f0a0039;
         public static final int button1=0x7f0a0014;
-        public static final int checkBox1=0x7f0a0048;
+        public static final int checkBox1=0x7f0a004e;
         public static final int content_frame=0x7f0a0017;
         public static final int create=0x7f0a001c;
         public static final int createPass=0x7f0a0010;
@@ -122,11 +123,11 @@ public final class R {
         public static final int document=0x7f0a0025;
         public static final int document_indicator=0x7f0a0026;
         public static final int drawer_layout=0x7f0a0016;
-        public static final int eraser=0x7f0a004b;
+        public static final int eraser=0x7f0a0051;
         public static final int etPassword=0x7f0a0037;
         public static final int host=0x7f0a0011;
         public static final int imageView1=0x7f0a001a;
-        public static final int imageView2=0x7f0a003a;
+        public static final int imageView2=0x7f0a0048;
         public static final int imgbtn_Room01=0x7f0a0000;
         public static final int imgbtn_Room02=0x7f0a0003;
         public static final int imgbtn_Room03=0x7f0a0005;
@@ -138,9 +139,10 @@ public final class R {
         public static final int left_drawer=0x7f0a0018;
         public static final int linlay=0x7f0a002b;
         public static final int listView_items=0x7f0a0040;
+        public static final int lv_survey_answers=0x7f0a0049;
         public static final int medium_brush=0x7f0a000d;
         public static final int member=0x7f0a0030;
-        public static final int menu_settings=0x7f0a004f;
+        public static final int menu_settings=0x7f0a0055;
         public static final int music=0x7f0a0027;
         public static final int music_indicator=0x7f0a0028;
         public static final int navigation_next=0x7f0a0036;
@@ -149,7 +151,7 @@ public final class R {
         public static final int nextQuestion=0x7f0a0042;
         public static final int pagenum_edit=0x7f0a0013;
         public static final int pdf_image=0x7f0a0019;
-        public static final int pen=0x7f0a004a;
+        public static final int pen=0x7f0a0050;
         public static final int picture=0x7f0a0021;
         public static final int picture_indicator=0x7f0a0022;
         public static final int player=0x7f0a002d;
@@ -161,14 +163,18 @@ public final class R {
         public static final int questiontextView=0x7f0a003c;
         public static final int relativeLayout=0x7f0a001b;
         public static final int relativeLayout2=0x7f0a001d;
-        public static final int save_btn=0x7f0a004c;
+        public static final int save_btn=0x7f0a0052;
         public static final int scrollView1=0x7f0a003d;
         public static final int small_brush=0x7f0a000c;
         public static final int survey=0x7f0a0029;
         public static final int survey_indicator=0x7f0a002a;
-        public static final int t_bg=0x7f0a004d;
+        public static final int t_bg=0x7f0a0053;
         public static final int textView=0x7f0a000f;
-        public static final int tv_poll_answer=0x7f0a0047;
+        public static final int tvAnswers=0x7f0a004c;
+        public static final int tvPlayerName=0x7f0a004b;
+        public static final int tvScore=0x7f0a004a;
+        public static final int tv_poll_answer=0x7f0a004d;
+        public static final int tv_waiting_questions=0x7f0a0047;
         public static final int txt_rm1cnt=0x7f0a0001;
         public static final int txt_rm2cnt=0x7f0a0004;
         public static final int txt_rm3cnt=0x7f0a0002;
@@ -178,7 +184,7 @@ public final class R {
         public static final int username_view=0x7f0a0012;
         public static final int video=0x7f0a0023;
         public static final int video_indicator=0x7f0a0024;
-        public static final int videoview=0x7f0a0049;
+        public static final int videoview=0x7f0a004f;
         public static final int webView1=0x7f0a0015;
         public static final int whiteboard=0x7f0a001f;
         public static final int whiteboard_indicator=0x7f0a0020;
@@ -209,9 +215,11 @@ public final class R {
         public static final int picture_activity=0x7f03000f;
         public static final int scroll_layout=0x7f030010;
         public static final int survey_activity=0x7f030011;
-        public static final int survey_list_item=0x7f030012;
-        public static final int video_activity=0x7f030013;
-        public static final int whiteboard_activity=0x7f030014;
+        public static final int survey_answers_activity=0x7f030012;
+        public static final int survey_answers_item=0x7f030013;
+        public static final int survey_list_item=0x7f030014;
+        public static final int video_activity=0x7f030015;
+        public static final int whiteboard_activity=0x7f030016;
     }
     public static final class menu {
         public static final int chat_main=0x7f090000;

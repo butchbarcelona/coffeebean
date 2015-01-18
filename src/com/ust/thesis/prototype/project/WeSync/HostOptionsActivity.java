@@ -71,6 +71,10 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 		txt4.setTypeface(font);
 		txt5.setTypeface(font);
 		txt6.setTypeface(font);
+		
+		if(!ChordConnectionManager.getInstance().isHost){
+			txt6.setText("Join Survey");
+		}
 
 		whiteboard = (Button) findViewById(R.id.whiteboard);
 		picture = (Button) findViewById(R.id.picture);

@@ -1,5 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -34,6 +36,8 @@ public class HomePageActivity extends Activity {
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+       
+            	ChordConnectionManager.getInstance().isHost = false;
                 Intent insertPass = new Intent(getApplicationContext(),
                         InsertPasswordActivity.class);
                 startActivity(insertPass);
@@ -44,6 +48,9 @@ public class HomePageActivity extends Activity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            	
+            	ChordConnectionManager.getInstance().isHost = true;
+            	
                 Intent createPass = new Intent(getApplicationContext(),
                         CreatePasswordActivity.class);
                 startActivity(createPass);

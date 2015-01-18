@@ -59,6 +59,10 @@
             android:label="Music"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".SurveyPlayerAnswersActivity"
+            android:label="Survey"
+            android:screenOrientation="portrait" />
         
     </application>
 
