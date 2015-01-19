@@ -112,7 +112,8 @@ public class SurveyPlayerAnswersActivity extends ChordActivity {
 				arrAnswer = str.split("\\|\\|");
 				if(arrAnswer.length > 1){
 					tvScore.setText(arrAnswer[1]);
-				}				
+					str = arrAnswer[0];
+				}	
 				answers += str + "\n";
 			}
 

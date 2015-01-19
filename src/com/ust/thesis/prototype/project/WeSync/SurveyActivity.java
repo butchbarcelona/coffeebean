@@ -1,6 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -61,6 +62,9 @@ public class SurveyActivity extends ChordActivity {
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
+		surveyAnswersintent = null;
+		
+		
 		finish();
 	}
 
@@ -145,10 +149,11 @@ public class SurveyActivity extends ChordActivity {
 						.getCheckedItemPosition()));
 				answers += "<>"+ strA;// String.valueOf(lv.getSelectedItem());
 
+				if(correctAnswer.equals(strA)){
+					score++;
+				}
+				
 				if (arrQuestions.size() >= 1) {
-					if(correctAnswer.equals(strA)){
-						score++;
-					}
 					showQuestion(arrQuestions.get(0));
 					arrQuestions.remove(0);
 
@@ -307,11 +312,18 @@ public class SurveyActivity extends ChordActivity {
 		});
 
 	}
+	
 
 	public static void saveMsg(byte[] payload) {
-		if (SurveyActivity.isRunning()) {
+		/*if (SurveyActivity.isRunning()) {
 			showSurvey(payload);
-		}
+		}else*/
+			//msgs = payload;
+			
+		if(!ChordConnectionManager.getInstance().isHost)
+			msgs = payload;
+		
+		showSurvey(payload);
 	}
 
 	public void showQuestion(SurveyQuestion sq) {
@@ -339,25 +351,32 @@ public class SurveyActivity extends ChordActivity {
 		// TODO Auto-generated method stub
 		super.onStart();
 	
-		if(msgs != null){
-			showSurvey(msgs);
+		
+		if(!ChordConnectionManager.getInstance().isHost){
+			if(msgs != null){
+				showSurvey(msgs);
+			}
+			
+			msgs = null;
 		}
 	
 	}
 	
+	public static ArrayList<byte[]> mapAnswers = null;
 	
 	public static void showSurvey(byte[] payload) {
-
-		msgs = payload;
-		
-		
 		String message = new String(payload);
-		
 		if (message.startsWith("^^^")) {
-			if (SurveyActivity.isHost) {
+			if (SurveyActivity.isHost) {  
+				
+			/*	if(mapAnswers == null){
+					mapAnswers  = new ArrayList<byte[]>();
+				}
+				
+				mapAnswers.add(payload);*/
+				
 				if (surveyAnswersintent != null) {
 					SurveyPlayerAnswersActivity.addAnswers(payload);
-					
 				} else {
 					surveyAnswersintent = new Intent(ctx,
 							SurveyPlayerAnswersActivity.class);
@@ -368,9 +387,6 @@ public class SurveyActivity extends ChordActivity {
 			}
 			
 		} else
-		
-		
-		
 		if (!ChordConnectionManager.getInstance().isHost) {
 
 			all.setVisibility(View.VISIBLE);
