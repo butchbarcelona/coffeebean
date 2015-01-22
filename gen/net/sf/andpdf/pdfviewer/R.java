@@ -14,39 +14,39 @@ public final class R {
 	public static final class drawable {
 		public static final int back01 = 0x7f020000;
 		public static final int back02 = 0x7f020001;
-		public static final int black = 0x7f020049;
-		public static final int blue = 0x7f02004a;
-		public static final int doc = 0x7f02001b;
-		public static final int folder = 0x7f02001d;
-		public static final int icon = 0x7f02002a;
-		public static final int left_arrow = 0x7f020035;
-		public static final int pdf = 0x7f02003b;
-		public static final int right_arrow = 0x7f020040;
-		public static final int violet = 0x7f02004b;
-		public static final int white = 0x7f020048;
-		public static final int zoom_in = 0x7f020046;
-		public static final int zoom_out = 0x7f020047;
+		public static final int black = 0x7f02004a;
+		public static final int blue = 0x7f02004b;
+		public static final int doc = 0x7f02001c;
+		public static final int folder = 0x7f02001e;
+		public static final int icon = 0x7f02002b;
+		public static final int left_arrow = 0x7f020036;
+		public static final int pdf = 0x7f02003c;
+		public static final int right_arrow = 0x7f020041;
+		public static final int violet = 0x7f02004c;
+		public static final int white = 0x7f020049;
+		public static final int zoom_in = 0x7f020047;
+		public static final int zoom_out = 0x7f020048;
 	}
 	public static final class id {
-		public static final int btExit = 0x7f0a0038;
-		public static final int btOK = 0x7f0a0039;
-		public static final int etPassword = 0x7f0a0037;
-		public static final int navigation_next = 0x7f0a0036;
-		public static final int navigation_page_position_label = 0x7f0a0034;
-		public static final int navigation_previous = 0x7f0a0035;
+		public static final int btExit = 0x7f0a003a;
+		public static final int btOK = 0x7f0a003b;
+		public static final int etPassword = 0x7f0a0039;
+		public static final int navigation_next = 0x7f0a0038;
+		public static final int navigation_page_position_label = 0x7f0a0036;
+		public static final int navigation_previous = 0x7f0a0037;
 		public static final int pagenum_edit = 0x7f0a0013;
-		public static final int pdf_image = 0x7f0a0019;
+		public static final int pdf_image = 0x7f0a001a;
 		public static final int username_view = 0x7f0a0012;
-		public static final int zoom_in = 0x7f0a0033;
-		public static final int zoom_out = 0x7f0a0032;
+		public static final int zoom_in = 0x7f0a0035;
+		public static final int zoom_out = 0x7f0a0034;
 	}
 	public static final class layout {
 		public static final int dialog_pagenumber = 0x7f030003;
 		public static final int graphics_view = 0x7f030006;
 		public static final int main = 0x7f03000a;
-		public static final int navigation_overlay = 0x7f03000d;
-		public static final int pdf_file_password = 0x7f03000e;
-		public static final int scroll_layout = 0x7f030010;
+		public static final int navigation_overlay = 0x7f03000e;
+		public static final int pdf_file_password = 0x7f03000f;
+		public static final int scroll_layout = 0x7f030011;
 	}
 	public static final class string {
 		public static final int app_name = 0x7f050001;

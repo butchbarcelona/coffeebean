@@ -12,8 +12,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -32,7 +36,7 @@ import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
  */
 public class VideoActivity extends ChordActivity {
 	Button button1;
-	static VideoView mVideoView;
+	static WeSyncVideoView mVideoView;
 	ImageView playmusic;
 	String[] musicname;
 	String[] musicpath;
@@ -41,6 +45,8 @@ public class VideoActivity extends ChordActivity {
 	AlertDialog levelDialog;
 	int countfile = 0;
 
+	static String filePath;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -48,33 +54,59 @@ public class VideoActivity extends ChordActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.video_activity);
 
-		mVideoView = (VideoView) findViewById(R.id.videoview);
+		mVideoView = (WeSyncVideoView) findViewById(R.id.videoview);
 
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		
-		MediaController mVidCtrlr = new MediaController(this);
-		mVidCtrlr.setAnchorView(mVideoView);
-		mVideoView.setMediaController(mVidCtrlr);
-		
-		
+
+		if (ChordConnectionManager.getInstance().isHost) {
+			MediaController mVidCtrlr = new MediaController(this);
+			mVidCtrlr.setAnchorView(mVideoView);
+			mVideoView.setMediaController(mVidCtrlr);
+			mVideoView.setListener(new IWeSyncVideoView() {
+
+				@Override
+				public void seekTo(int msec) {
+					byte[][] payload = new byte[1][1];
+					payload[0] = String.valueOf(msec).getBytes();
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.VIDEO_PLAY_SKIP_TO);
+				}
+
+				@Override
+				public void play() {
+					byte[][] payload = new byte[1][1];
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.VIDEO_PLAY_CONTINUE);
+				}
+
+				@Override
+				public void pause() {
+					byte[][] payload = new byte[1][1];
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.VIDEO_PLAY_PAUSE);
+				}
+			});
+		}
+
 		button1 = (Button) findViewById(R.id.button1);
-		/*playmusic = (ImageView) findViewById(R.id.playmusic);*/
+		/* playmusic = (ImageView) findViewById(R.id.playmusic); */
 
 		walkdir(Environment.getExternalStorageDirectory());
 
-		/*playmusic.setOnClickListener(new OnClickListener() {
-			@SuppressLint("WrongCall")
-			@Override
-			public void onClick(View v) {
-				if (!(button1.getText().equals("Select Video"))) {
-					
-
-				} else
-					Toast.makeText(VideoActivity.this, "NO VIDEO SELECTED",
-							Toast.LENGTH_SHORT).show();
-
-			}
-		});*/
+		/*
+		 * playmusic.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @SuppressLint("WrongCall")
+		 * 
+		 * @Override public void onClick(View v) { if
+		 * (!(button1.getText().equals("Select Video"))) {
+		 * 
+		 * 
+		 * } else Toast.makeText(VideoActivity.this, "NO VIDEO SELECTED",
+		 * Toast.LENGTH_SHORT).show();
+		 * 
+		 * } });
+		 */
 
 		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
@@ -105,12 +137,15 @@ public class VideoActivity extends ChordActivity {
 									button1.setText(musicname[item] + "");
 									chosen = item;
 									levelDialog.dismiss();
-									playSelectedVid();
+
+									if(ChordConnectionManager.getInstance().nodes.size() > 1)
+										sendSelectedVid();
+									else
+										playSelectedVid( musicpath[chosen]);
 								}
 							});
 					levelDialog = builder.create();
 					levelDialog.show();
-					
 
 				} else {
 					Toast.makeText(VideoActivity.this, "NO VIDEO FOUND",
@@ -119,24 +154,15 @@ public class VideoActivity extends ChordActivity {
 			}
 		});
 
-		
 	}
+
 	
-	public void playSelectedVid(){
+	public void sendSelectedVid() {
 		// Play audio
 		File file = new File(musicpath[chosen]);
-		String SrcPath = (musicpath[chosen]);
-		if (file.exists())
-			System.out.println("exist");
-		else
-			System.out.println("do not exist : "
-					+ musicpath[chosen]);
-
-		mVideoView.setVideoPath(SrcPath);
 		
-		
-		mVideoView.requestFocus();
-		mVideoView.start();
+		filePath = musicpath[chosen];
+		ChordConnectionManager.getInstance().resetCallBack();
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		try {
@@ -153,12 +179,11 @@ public class VideoActivity extends ChordActivity {
 
 			byte[][] payload = new byte[1][];
 			payload[0] = data;
-			
+
 			byteArrayMsg = data;
 
 			ChordConnectionManager.getInstance().sendData(payload,
 					ChordMessageType.VIDEO_PLAY);
-			
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -168,6 +193,8 @@ public class VideoActivity extends ChordActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Error 1: " + e);
+		} catch (OutOfMemoryError e){
+			Toast.makeText(getApplicationContext(), "Out of memory :( ", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -209,18 +236,28 @@ public class VideoActivity extends ChordActivity {
 	}
 
 	static byte[] byteArrayMsg;
+	static byte[] byteArrayMsgVideo;
 
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		
-		if(byteArrayMsg != null){
-			showVideo(byteArrayMsg);
+
+		switch (currentType) {
+		case VIDEO_PLAY_PLAY:
+		case VIDEO_PLAY_SKIP_TO:
+
+			if (byteArrayMsgVideo != null && !mVideoView.isPlaying()){
+				showVideo(byteArrayMsgVideo);
+			}
+
+			VideoActivity.skipTo(currMs);
+			break;
 		}
+
 	}
-	
-	public static void showVideo(byte[] byteArray){
+
+	public static void showVideo(byte[] byteArray) {
 
 		String path = Environment.getExternalStorageDirectory()
 				.getAbsolutePath() + "/Android/temp.mp4";
@@ -238,21 +275,110 @@ public class VideoActivity extends ChordActivity {
 		} catch (IOException e) {
 			// handle exception
 		}
-
-		// String SrcPath = path;//"/sdcard/SHELLA2.mp4";
-		mVideoView.setVideoPath(path);
-		mVideoView.requestFocus();
-		mVideoView.start();
+		playSelectedVid(path);
 	}
 	
-	
-	public static void playVideo(byte[][] payload) {
 
-		if (VideoActivity.isRunning()) {
-			byteArrayMsg = null;
-			showVideo(payload[0]);
-		} else
-			byteArrayMsg = payload[0];
+	public static void playSelectedVid(String path) {
+
+		File file = new File(path);
+		String SrcPath = (path);
+		if (file.exists())
+			System.out.println("exist");
+		else
+			System.out.println("do not exist : " + path);
+
+		mVideoView.setVideoPath(SrcPath);
+		
+		if(ChordConnectionManager.getInstance().isHost)
+			new VideoAsyncTask().execute();
+		
+		//mVideoView.requestFocus();
+		//mVideoView.start();
+	}
+
+	
+	public static int currMs = 0;
+	public static void skipTo(int ms){
+	
+		currMs = ms;
+		
+		if(mVideoView != null){
+			mVideoView.seekTo(ms);
+		}
+	}
+	
+
+	
+	
+	public static void playPauseVideo(ChordMessageType type) {
+
+		switch (type) {
+		case VIDEO_PLAY_CONTINUE:
+			mVideoView.start();
+			break;
+		case VIDEO_PLAY_PAUSE:
+			mVideoView.pause();
+			break;
+		}
+
+	}
+	
+	 private static class VideoAsyncTask extends AsyncTask<Void, Integer, Void>
+	    {
+	        int duration = 0;
+	        int current = 0;
+	        @Override
+	        protected Void doInBackground(Void... params) {
+	        	
+	        	mVideoView.requestFocus(); 
+	            mVideoView.start();
+	            mVideoView.setOnPreparedListener(new OnPreparedListener() {
+
+	                public void onPrepared(MediaPlayer mp) {
+	                    duration = mVideoView.getDuration();
+	                }
+	            });
+
+	            do {
+	                current = mVideoView.getCurrentPosition();
+	                
+	                byte[][] payload = new byte[1][1];
+	                
+	                payload[0] = String.valueOf(current).getBytes();
+	    			Log.d("butch","sending current ms:"+current);
+	                ChordConnectionManager.getInstance().sendData(payload, ChordMessageType.VIDEO_PLAY_SKIP_TO);
+	                   
+	                //publishProgress((int) (current * 100 / duration));
+	                 
+	            } while (mVideoView.isPlaying());
+
+	            return null;
+	        }
+
+	    }
+
+	static ChordMessageType currentType = ChordMessageType.VIDEO_PLAY;
+
+	public static void playVideo(byte[][] payload, ChordMessageType type) {
+
+		currentType = type;
+		switch (type) {
+		case VIDEO_PLAY:
+			byteArrayMsgVideo = payload[0];
+			break;
+		case VIDEO_PLAY_DATA_COMPLETE:
+			ChordConnectionManager.getInstance().sendData(payload,
+					ChordMessageType.VIDEO_PLAY_PLAY);
+			if (ChordConnectionManager.getInstance().isHost) {
+				playSelectedVid(filePath);
+			}
+			break;
+		case VIDEO_PLAY_PLAY:
+			showVideo(byteArrayMsgVideo);
+			break;
+		}
+
 	}
 
 }

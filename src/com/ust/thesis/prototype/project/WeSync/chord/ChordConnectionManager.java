@@ -1,12 +1,10 @@
 package com.ust.thesis.prototype.project.WeSync.chord;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
@@ -21,11 +19,11 @@ import com.samsung.android.sdk.chord.SchordChannel;
 import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
 import com.ust.thesis.prototype.project.WeSync.DocumentActivity;
+import com.ust.thesis.prototype.project.WeSync.Global;
 import com.ust.thesis.prototype.project.WeSync.HostOptionsActivity;
 import com.ust.thesis.prototype.project.WeSync.MusicActivity;
 import com.ust.thesis.prototype.project.WeSync.PictureActivity;
 import com.ust.thesis.prototype.project.WeSync.SurveyActivity;
-import com.ust.thesis.prototype.project.WeSync.SurveyPlayerAnswersActivity;
 import com.ust.thesis.prototype.project.WeSync.VideoActivity;
 import com.ust.thesis.prototype.project.WeSync.WhiteboardActivity;
 
@@ -33,15 +31,16 @@ public class ChordConnectionManager {
 
 	private static ChordConnectionManager instance = null;
 	public static ChordManagerState chordState = ChordManagerState.STOP;
-	private HashMap<String, RoomType> members;
-	private HashMap<String, String> nodes;
-	
-	
+	public HashMap<String, RoomType> members;
+	public HashMap<String, String> nodes;
+	public HashMap<String, Boolean> receivedCallback;
+
 	public boolean isHost = false;
 
 	private ChordConnectionManager() {
 		members = new HashMap<String, RoomType>();
 		nodes = new HashMap<String, String>();
+
 	}
 
 	public static ChordConnectionManager getInstance() {
@@ -73,11 +72,24 @@ public class ChordConnectionManager {
 																			// server
 	private Context ctx;
 
+	private static String channelPass = CHORD_HELLO_TEST_CHANNEL;
+
 	public void sendData(byte[][] payload, ChordMessageType type) {
 		try {
 			SchordChannel channel = mChordManager
-					.getJoinedChannel(CHORD_HELLO_TEST_CHANNEL);
+					.getJoinedChannel(getChannelPass());
 			channel.sendDataToAll(type.getString(), payload);
+		} catch (NullPointerException e) {
+			Log.d("coffeebean", "error null");
+		}
+	}
+
+	public void sendData(String fromNode, byte[][] payload,
+			ChordMessageType type) {
+		try {
+			SchordChannel channel = mChordManager
+					.getJoinedChannel(getChannelPass());
+			channel.sendData(fromNode, type.getString(), payload);
 		} catch (NullPointerException e) {
 			Log.d("coffeebean", "error null");
 		}
@@ -267,7 +279,8 @@ public class ChordConnectionManager {
 	public void sendName() {
 
 		// send name of device
-		String phoneName = BluetoothAdapter.getDefaultAdapter().getName();
+		String phoneName = (Global.getPlayerName().isEmpty()) ? BluetoothAdapter
+				.getDefaultAdapter().getName() : Global.getPlayerName();
 		byte[][] payload = new byte[1][];
 		payload[0] = phoneName.getBytes();
 		sendData(payload, ChordMessageType.SENDING_NAME);
@@ -278,17 +291,15 @@ public class ChordConnectionManager {
 
 		// 5. Join my channel
 		Log.d("coffeebean", "ChordConnectionManager:" + "    joinChannel");
-		channel = mChordManager.joinChannel(CHORD_HELLO_TEST_CHANNEL,
-				mChannelListener);
+		channel = mChordManager.joinChannel(getChannelPass(), mChannelListener);
 		chordState = ChordManagerState.RUNNING;
 
 		// adding current user
 		String nodeName = mChordManager.getName();
 		members.put(nodeName, RoomType.HOST);// add(BluetoothAdapter.getDefaultAdapter().getName());
-		nodes.put(nodeName, BluetoothAdapter.getDefaultAdapter().getName());
+		nodes.put(nodeName, Global.getPlayerName());
 
-		HostOptionsActivity.addMemberToList(BluetoothAdapter
-				.getDefaultAdapter().getName());
+		HostOptionsActivity.addMemberToList(Global.getPlayerName());
 
 		if (channel == null) {
 			Log.d("coffeebean", "ChordConnectionManager:"
@@ -307,13 +318,46 @@ public class ChordConnectionManager {
 		mChordManager.setNetworkListener(null);
 
 		// 7. Stop Chord. You can call leaveChannel explicitly.
-		// mChordManager.leaveChannel(CHORD_HELLO_TEST_CHANNEL);
+		// mChordManager.leaveChannel(channelPass);
 
 		Log.d("coffeebean", "ChordConnectionManager:" + "    stop");
 		mChordManager.stop();
 	}
 
-	
+	public void resetCallBack() {
+		if (receivedCallback == null)
+			receivedCallback = new HashMap<String, Boolean>();
+
+		receivedCallback.clear();
+
+		for (String key : members.keySet()) {
+			receivedCallback.put(key, false);
+		}
+
+		if (isHost)
+			receivedCallback.put(mChordManager.getName(), true);
+	}
+
+	private boolean haveAllCalledBack() {
+
+		for (Boolean isCallinBack : receivedCallback.values()) {
+			if (!isCallinBack) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static String getChannelPass() {
+		return channelPass;
+	}
+
+	public static void setChannelPass(String channelPass) {
+		ChordConnectionManager.channelPass = (channelPass.isEmpty()) ? CHORD_HELLO_TEST_CHANNEL
+				: channelPass;
+	}
+
 	// ***************************************************
 	// ChordChannelListener
 	// ***************************************************
@@ -323,7 +367,7 @@ public class ChordConnectionManager {
 
 		@Override
 		public void onNodeLeft(String fromNode, String fromChannel) {
-			Toast.makeText(ctx, fromNode + " has left the " + fromChannel,
+			Toast.makeText(ctx, nodes.get(fromNode) + " has left the " + fromChannel,
 					Toast.LENGTH_SHORT).show();
 			HostOptionsActivity.removeMemberFromList(nodes.get(fromNode));
 		}
@@ -331,8 +375,6 @@ public class ChordConnectionManager {
 		// Called when a node join event is raised on the channel
 		@Override
 		public void onNodeJoined(String fromNode, String fromChannel) {
-			Toast.makeText(ctx, fromNode + " has joined the " + fromChannel,
-					Toast.LENGTH_SHORT).show();
 			sendName();
 		}
 
@@ -340,7 +382,8 @@ public class ChordConnectionManager {
 		public void onDataReceived(String fromNode, String fromChannel,
 				String payloadType, byte[][] payload) {
 
-			switch (ChordMessageType.getSyncType(payloadType)) {
+			ChordMessageType type = ChordMessageType.getSyncType(payloadType);
+			switch (type) {
 			case CHANGING_ROOM:
 				members.put(fromNode,
 						RoomType.getRoomType(new String(payload[0])));
@@ -352,58 +395,87 @@ public class ChordConnectionManager {
 				if (!name.isEmpty() && !members.containsKey(fromNode)) {
 					members.put(fromNode, RoomType.HOST);
 					nodes.put(fromNode, name);
+					Toast.makeText(ctx, name + " has joined the " + channelPass,
+							Toast.LENGTH_SHORT).show();
 					HostOptionsActivity.addMemberToList(name);
 				}
 				break;
 
-			case MUSIC_PLAY:
+			/*case MUSIC_PLAY:
 				Toast.makeText(ctx, "MUSIC!", Toast.LENGTH_SHORT).show();
-				MusicActivity.setMp3Bytes(payload[0]);
-				break;
+				MusicActivity___.setMp3Bytes(payload[0], type);
+				break;*/
 			case SHOW_PICTURE:
 				// Toast.makeText(ctx, "PICTURE!", Toast.LENGTH_SHORT).show();
 				Bitmap bmp = BitmapFactory.decodeByteArray(payload[0], 0,
 						payload[0].length);
 				PictureActivity.setImage(bmp);
 				break;
-			case VIDEO_PLAY:
-				// Toast.makeText(ctx, "VIDEO!", Toast.LENGTH_SHORT).show();
-				VideoActivity.playVideo(payload);
+				
+			case MUSIC_PLAY:
+				MusicActivity.playMusic(payload, type);
+				payload = new byte[1][1];
+				sendData(fromNode, payload,
+						ChordMessageType.MUSIC_PLAY_DATA_COMPLETE);
 				break;
-			case WHITEBOARD:
-				// Toast.makeText(ctx, "WHITEBOARD!",
-				// Toast.LENGTH_SHORT).show();
-				WhiteboardActivity.drawBoard(fromNode, payload);
+			case MUSIC_PLAY_DATA_COMPLETE:
+				// TODO: check if all nodes have called back
+				receivedCallback.put(fromNode, true);
+				if (haveAllCalledBack()) {
+					MusicActivity.playMusic(payload, type);
+				}
+				break;
+			case MUSIC_PLAY_PLAY:
+				MusicActivity.playMusic(payload, type);
+				break;
+			case MUSIC_PLAY_SKIP_TO:
+				MusicActivity.skipTo(Integer.parseInt(new String(payload[0])));
+				break;
+			case MUSIC_PLAY_CONTINUE:
+			case MUSIC_PLAY_PAUSE:
+				MusicActivity.playPauseMusic(type);
+				break;
+				
+			case VIDEO_PLAY:
 
+				VideoActivity.playVideo(payload, type);
+				payload = new byte[1][1];
+				sendData(fromNode, payload,
+						ChordMessageType.VIDEO_PLAY_DATA_COMPLETE);
+				break;
+			case VIDEO_PLAY_DATA_COMPLETE:
+
+				// TODO: check if all nodes have called back
+				receivedCallback.put(fromNode, true);
+				if (haveAllCalledBack()) {
+					VideoActivity.playVideo(payload, type);
+				}
+
+				break;
+			case VIDEO_PLAY_PLAY:
+				VideoActivity.playVideo(payload, type);
+				break;
+			case VIDEO_PLAY_SKIP_TO:
+				VideoActivity.skipTo(Integer.parseInt(new String(payload[0])));
+				break;
+
+			case VIDEO_PLAY_CONTINUE:
+			case VIDEO_PLAY_PAUSE:
+				VideoActivity.playPauseVideo(type);
+				break;
+				
+			case WHITEBOARD:
+				WhiteboardActivity.drawBoard(fromNode, payload);
 				break;
 			case SHOW_DOCUMENT:
-
 				Toast.makeText(ctx, "DOCUMENT!", Toast.LENGTH_SHORT).show();
-				DocumentActivity.pdfLoadImages(ctx, payload[0]);
+				DocumentActivity.pdfLoadImages(ctx, payload);
 
 				break;
 
 			case SHOW_SURVEY:
+				SurveyActivity.saveMsg(payload[0]);
 
-				String msg = new String(payload[0]);
-
-				/*if (msg.startsWith("^^^")) {
-					if (SurveyActivity.isHost) {
-						if (surveyAnswersintent != null) {
-							SurveyPlayerAnswersActivity.addAnswers(payload[0]);
-							
-						} else {
-							surveyAnswersintent = new Intent(ctx,
-									SurveyPlayerAnswersActivity.class);
-							surveyAnswersintent.putExtra("msgs", payload[0]);
-							ctx.startActivity(surveyAnswersintent);
-						}
-					}
-					
-				} else*/ {
-
-					SurveyActivity.saveMsg(payload[0]);
-				}
 				break;
 			default:
 				break;

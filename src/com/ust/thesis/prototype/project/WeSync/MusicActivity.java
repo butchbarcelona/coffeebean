@@ -3,35 +3,39 @@ package com.ust.thesis.prototype.project.WeSync;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.MediaController.MediaPlayerControl;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordMessageType;
 
-/**
- * Created by robertjordanebdalin on 8/28/14.
- */
 public class MusicActivity extends ChordActivity {
 	Button button1;
+	static WeSyncVideoView mVideoView;
 	ImageView playmusic;
-	static MediaPlayer mp;
 	String[] musicname;
 	String[] musicpath;
 	String mname = "", mpath = "";
@@ -39,84 +43,54 @@ public class MusicActivity extends ChordActivity {
 	AlertDialog levelDialog;
 	int countfile = 0;
 
-	static File pathToCache;
+	static String filePath;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.music_activity);
+		setContentView(R.layout.music_play_activity);
 
-		pathToCache = getCacheDir();
-		walkdir(Environment.getExternalStorageDirectory());
+		mVideoView = (WeSyncVideoView) findViewById(R.id.videoview);
+
+		if (ChordConnectionManager.getInstance().isHost) {
+			MediaController mVidCtrlr = new MediaController(this);
+			mVidCtrlr.setAnchorView(mVideoView);
+			mVideoView.setMediaController(mVidCtrlr);
+
+			mVideoView.setListener(new IWeSyncVideoView() {
+
+				@Override
+				public void seekTo(int msec) {
+					byte[][] payload = new byte[1][1];
+					payload[0] = String.valueOf(msec).getBytes();
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.MUSIC_PLAY_SKIP_TO);
+				}
+
+				@Override
+				public void play() {
+					byte[][] payload = new byte[1][1];
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.MUSIC_PLAY_CONTINUE);
+
+				}
+
+				@Override
+				public void pause() {
+					
+					
+					byte[][] payload = new byte[1][1];
+					ChordConnectionManager.getInstance().sendData(payload,
+							ChordMessageType.MUSIC_PLAY_PAUSE);
+				}
+			});
+		}
 
 		button1 = (Button) findViewById(R.id.button1);
-		playmusic = (ImageView) findViewById(R.id.playmusic);
 
-		playmusic.setOnClickListener(new OnClickListener() {
-			@SuppressLint("WrongCall")
-			@Override
-			public void onClick(View v) {
-				// Play audio
-				if (!(button1.getText().equals("Select Music"))) {
-					mp = new MediaPlayer();
-
-					// Set data source -
-					try {
-						String filePath = musicpath[chosen];
-						File file = new File(filePath);
-						if (file.exists())
-							System.out.println("EXIST");
-						else
-							System.out.println("DO NOT EXIST : "
-									+ musicpath[chosen]);
-						mp.setDataSource(filePath);
-						mp.prepare();
-						mp.start();
-
-						ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-						InputStream is = new FileInputStream(file);
-						byte[] temp = new byte[1024];
-						int read;
-
-						while ((read = is.read(temp)) >= 0) {
-							buffer.write(temp, 0, read);
-						}
-
-						byte[] data = buffer.toByteArray();
-
-						byte[][] payload = new byte[1][];
-						payload[0] = data;
-
-						// TODO: chord
-						ChordConnectionManager.getInstance().sendData(payload,
-								ChordMessageType.MUSIC_PLAY);
-
-					} catch (IllegalArgumentException e) {
-						System.out.println("Error : " + e);
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						System.out.println("Error 1: " + e);
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalStateException e) {
-						System.out.println("Error 2: " + e);
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						System.out.println("Error 3: " + e);
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				} else
-					Toast.makeText(MusicActivity.this, "NO MUSIC SELECTED",
-							Toast.LENGTH_SHORT).show();
-			}
-		});
+		walkdir(Environment.getExternalStorageDirectory());
 
 		button1.setOnClickListener(new OnClickListener() {
 			@SuppressLint("WrongCall")
@@ -144,9 +118,13 @@ public class MusicActivity extends ChordActivity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int item) {
-									button1.setText(musicname[item]);
+									button1.setText(musicname[item] + "");
 									chosen = item;
 									levelDialog.dismiss();
+									if(ChordConnectionManager.getInstance().nodes.size() > 1)
+										sendSelectedMusic();
+									else
+										playSelectedMusic( musicpath[chosen]);
 								}
 							});
 					levelDialog = builder.create();
@@ -159,6 +137,45 @@ public class MusicActivity extends ChordActivity {
 			}
 		});
 
+	}
+
+	public void sendSelectedMusic() {
+		// Play audio
+		File file = new File(musicpath[chosen]);
+
+		filePath = musicpath[chosen];
+		ChordConnectionManager.getInstance().resetCallBack();
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try {
+
+			InputStream is = new FileInputStream(file);
+			byte[] temp = new byte[1024];
+			int read;
+
+			while ((read = is.read(temp)) >= 0) {
+				buffer.write(temp, 0, read);
+			}
+			is.close();
+			byte[] data = buffer.toByteArray();
+
+			byte[][] payload = new byte[1][];
+			payload[0] = data;
+
+			byteArrayMsg = data;
+
+			ChordConnectionManager.getInstance().sendData(payload,
+					ChordMessageType.MUSIC_PLAY);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Error : " + e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Error 1: " + e);
+		}
 	}
 
 	public void walkdir(File dir) {
@@ -193,69 +210,181 @@ public class MusicActivity extends ChordActivity {
 
 	@Override
 	public void onBackPressed() {
+		// code here to show dialog
 		super.onBackPressed();
-
-		if (mp != null) {
-			if (mp.isPlaying())
-				mp.stop();
-		}
-
 		finish();
 	}
-	
+
+	static byte[] byteArrayMsg;
+	static byte[] byteArrayMsgMusic;
+
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		if(byteArrayMsg != null)
-			playMusic(byteArrayMsg);
-	
-	}
 
-	static byte[] byteArrayMsg = null;
-	
-	public static void playMusic(byte[] mp3Bytes){
+		switch (currentType) {
+		case MUSIC_PLAY_PLAY:
+		case MUSIC_PLAY_SKIP_TO:
 
-		try {
-			// create temp file that will hold byte array
-			File tempMp3 = File.createTempFile("kurchina", "mp3",
-					pathToCache);// getCacheDir());
-			tempMp3.deleteOnExit();
-			FileOutputStream fos = new FileOutputStream(tempMp3);
-			fos.write(mp3Bytes);
-			fos.close();
-
-			if (mp != null) {
-				if (mp.isPlaying())
-					mp.stop();
+			if (byteArrayMsgMusic != null && !mVideoView.isPlaying()) {
+				showMusic(byteArrayMsgMusic);
 			}
 
-			// Tried reusing instance of media player
-			// but that resulted in system crashes...
-			mp = new MediaPlayer();
+			MusicActivity.skipTo(currMs);
+			break;
+		}
 
-			// Tried passing path directly, but kept getting
-			// "Prepare failed.: status=0x1"
-			// so using file descriptor instead
-			FileInputStream fis = new FileInputStream(tempMp3);
-			mp.setDataSource(fis.getFD());
+	}
 
-			mp.prepare();
-			mp.start();
-		} catch (IOException ex) {
-			String s = ex.toString();
-			ex.printStackTrace();
+	public static void showMusic(byte[] byteArray) {
+
+		String path = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Android/temp.mp3";
+
+		File file = new File(path);
+		// "/sdcard/SHELLA2.mp4");
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(file);
+			fos.write(byteArray);
+			fos.flush();
+			fos.close();
+		} catch (FileNotFoundException e) {
+			// handle exception
+		} catch (IOException e) {
+			// handle exception
+		}
+		playSelectedMusic(path);
+	}
+
+	public static void playSelectedMusic(String path) {
+
+		File file = new File(path);
+		String SrcPath = (path);
+		if (file.exists())
+			System.out.println("exist");
+		else
+			System.out.println("do not exist : " + path);
+
+		mVideoView.setVideoPath(SrcPath);
+
+		if (ChordConnectionManager.getInstance().isHost)
+			new MusicAsyncTask().execute();
+
+		// mVideoView.requestFocus();
+		// mVideoView.start();
+	}
+
+	public static int currMs = 0;
+
+	public static void skipTo(int ms) {
+
+		currMs = ms;
+
+		if (mVideoView != null) {
+			mVideoView.seekTo(ms);
 		}
 	}
 
-	public static void setMp3Bytes(byte[] mp3Bytes) {
+	public static void playPauseMusic(ChordMessageType type) {
 
-		if (isRunning()) {
-			byteArrayMsg = null;
-			playMusic(mp3Bytes);			
-		} else {
-			byteArrayMsg = mp3Bytes;
+		switch (type) {
+		case MUSIC_PLAY_CONTINUE:
+			if (ChordConnectionManager.getInstance().isHost)
+				new MusicAsyncTask().execute();
+			else
+				mVideoView.start();
+			break;
+		case MUSIC_PLAY_PAUSE:
+			mVideoView.pause();
+			break;
 		}
+
+	}
+
+	private static class MusicAsyncTask extends AsyncTask<Void, Integer, Void> {
+		int duration = 0;
+		int current = 0;
+
+		
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+
+			Log.d("MusicAsyncTask", "Pre executing!");
+			if (mVideoView.isPlaying())
+				mVideoView.stopPlayback();
+			
+			mVideoView.setOnPreparedListener(new OnPreparedListener() {
+
+				public void onPrepared(MediaPlayer mp) {
+					duration = mVideoView.getDuration();
+				}
+			});
+			
+		}
+		
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			mVideoView.requestFocus();
+			mVideoView.start();
+
+		/*	do {
+				//Log.d("MusicAsyncTask", "Still inside while loop");
+				current = mVideoView.getCurrentPosition();
+
+				byte[][] payload = new byte[1][1];
+
+				Log.d("MusicAsyncTask", "sending current ms:" + current);
+				payload[0] = String.valueOf(current).getBytes();
+				
+				ChordConnectionManager.getInstance().sendData(payload,
+						ChordMessageType.MUSIC_PLAY_SKIP_TO);
+
+				// publishProgress((int) (current * 100 / duration));
+
+			} while (mVideoView.isPlaying());*/
+
+			return null;
+		}
+		
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+
+			Log.d("MusicAsyncTask", "Finishing asynctask");
+		}
+
+	}
+
+	static ChordMessageType currentType = ChordMessageType.MUSIC_PLAY;
+
+	public static void playMusic(byte[][] payload, ChordMessageType type) {
+
+		currentType = type;
+		switch (type) {
+		case MUSIC_PLAY:
+			byteArrayMsgMusic = payload[0];
+			break;
+		case MUSIC_PLAY_DATA_COMPLETE:
+			ChordConnectionManager.getInstance().sendData(payload,
+					ChordMessageType.MUSIC_PLAY_PLAY);
+			if (ChordConnectionManager.getInstance().isHost) {
+				playSelectedMusic(filePath);
+			}
+			break;
+		case MUSIC_PLAY_PLAY:
+			if(MusicActivity.isRunning())
+				showMusic(byteArrayMsgMusic);
+			break;
+		}
+
 	}
 
 }

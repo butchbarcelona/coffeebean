@@ -1,6 +1,8 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import com.ust.thesis.prototype.project.WeSync.chord.CWifiConnectivity;
 import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
+import com.ust.thesis.prototype.project.WeSync.chord.WifiApControl;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,10 +20,9 @@ public class HomePageActivity extends Activity {
 
         Button create, join;
         
-        
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.home_page_activity);
 
@@ -33,6 +34,7 @@ public class HomePageActivity extends Activity {
         txt.setTypeface(font);
         txta.setTypeface(font);
 
+        
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,8 +42,7 @@ public class HomePageActivity extends Activity {
             	ChordConnectionManager.getInstance().isHost = false;
                 Intent insertPass = new Intent(getApplicationContext(),
                         InsertPasswordActivity.class);
-                startActivity(insertPass);
-                finish();
+                startActivity(insertPass); 
             }
         });
 
@@ -54,8 +55,8 @@ public class HomePageActivity extends Activity {
                 Intent createPass = new Intent(getApplicationContext(),
                         CreatePasswordActivity.class);
                 startActivity(createPass);
-                finish();
             }
         });
     }
+
 }

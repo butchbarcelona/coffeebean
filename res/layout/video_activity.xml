@@ -6,8 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <Button
@@ -24,7 +23,7 @@
         android:layout_weight="7"
         android:orientation="vertical" >
         
-         <VideoView
+         <com.ust.thesis.prototype.project.WeSync.WeSyncVideoView
     android:id="@+id/videoview" 
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"

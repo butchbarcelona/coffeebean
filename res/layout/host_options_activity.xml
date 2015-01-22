@@ -10,158 +10,174 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-            <ScrollView 
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:gravity="center_vertical|top"
-            android:orientation="vertical"
-            android:padding="10dp" >
+            android:layout_height="wrap_content" >
 
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/collaboard3" />
-
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="match_parent"
+                android:background="#ffffff"
+                android:gravity="center_vertical|top"
+                android:orientation="vertical"
+                android:padding="10dp" >
 
-                <Button
-                    android:id="@+id/whiteboard"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_wb_button"
-                    android:gravity="center"
-                    android:paddingLeft="0dp"
-                    android:text="Whiteboard" />
-
-                <TextView
-                    android:id="@+id/whiteboard_indicator"
+                <ImageView
+                    android:id="@+id/imageView1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/whiteboard"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/collaboard3" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-                <Button
-                    android:id="@+id/picture"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_picture_button"
-                    android:gravity="center"
-                    android:paddingLeft="20dp"
-                    android:text="Share Picture" />
+                    <Button
+                        android:id="@+id/whiteboard"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_wb_button"
+                        android:gravity="center"
+                        android:paddingLeft="0dp"
+                        android:text="Whiteboard" />
 
-                <TextView
-                    android:id="@+id/picture_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/picture"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
+                    <ImageView
+                        android:id="@+id/whiteboard_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/whiteboard"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
+                    <!--
+                    <TextView
+                        android:id="@+id/whiteboard_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/whiteboard"
+                        android:layout_centerVertical="true"
+                        android:text="0"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                    -->
+                </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-                <Button
-                    android:id="@+id/video"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_video_button"
-                    android:gravity="center"
-                    android:paddingLeft="10dp"
-                    android:text="Share Video" />
+                    <Button
+                        android:id="@+id/picture"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_picture_button"
+                        android:gravity="center"
+                        android:paddingLeft="20dp"
+                        android:text="Share Picture" />
 
-                <TextView
-                    android:id="@+id/video_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/video"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
+                    <ImageView
+                        android:id="@+id/picture_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/picture"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
+                </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-                <Button
-                    android:id="@+id/document"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_doc_button"
-                    android:gravity="center"
-                    android:paddingLeft="60dp"
-                    android:text="Share Document" />
+                    <Button
+                        android:id="@+id/video"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_video_button"
+                        android:gravity="center"
+                        android:paddingLeft="10dp"
+                        android:text="Share Video" />
+                    <ImageView
+                        android:id="@+id/video_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/video"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
+                </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/document_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/document"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                    <Button
+                        android:id="@+id/document"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_doc_button"
+                        android:gravity="center"
+                        android:paddingLeft="60dp"
+                        android:text="Share Document" />
+                    <ImageView
+                        android:id="@+id/document_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/document"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/music"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_music_button"
-                    android:gravity="center"
-                    android:paddingLeft="18dp"
-                    android:text="Share Music" />
+                </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/music_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/music"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                    <Button
+                        android:id="@+id/music"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_music_button"
+                        android:gravity="center"
+                        android:paddingLeft="18dp"
+                        android:text="Share Music" />
 
-                <Button
-                    android:id="@+id/survey"
-                    style="@style/ButtonText"
-                    android:background="@drawable/layer_createsurvey_button"
-                    android:gravity="center"
-                    android:paddingLeft="30dp"
-                    android:text="Create Survey" />
+                    <ImageView
+                        android:id="@+id/music_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/music"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
+                </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/survey_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/survey"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RelativeLayout>
-        </LinearLayout>
-            </ScrollView>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <Button
+                        android:id="@+id/survey"
+                        style="@style/ButtonText"
+                        android:background="@drawable/layer_createsurvey_button"
+                        android:gravity="center"
+                        android:paddingLeft="30dp"
+                        android:text="Create Survey" />
+
+                    <ImageView
+                        android:id="@+id/survey_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/survey"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/check_white"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+            </LinearLayout>
+        </ScrollView>
     </FrameLayout>
     <!-- The navigation drawer -->
 

@@ -2,8 +2,6 @@ package com.ust.thesis.prototype.project.WeSync;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,7 +27,7 @@ import com.ust.thesis.prototype.project.WeSync.chord.RoomType;
 public class HostOptionsActivity extends Activity implements OnClickListener {
 
 	Button whiteboard, picture, video, document, music, survey;
-	static TextView whiteIndicator, pictureIndicator, vidIndicator,
+	static ImageView whiteIndicator, pictureIndicator, vidIndicator,
 			docIndicator, musicIndicator, surveyIndicator;
 
 	ListView mDrawerList;
@@ -48,12 +47,12 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 		// Set the adapter for the list view
 		mDrawerList.setAdapter(drawerListAdapter);
 
-		whiteIndicator = (TextView) findViewById(R.id.whiteboard_indicator);
-		pictureIndicator = (TextView) findViewById(R.id.picture_indicator);
-		vidIndicator = (TextView) findViewById(R.id.video_indicator);
-		docIndicator = (TextView) findViewById(R.id.document_indicator);
-		musicIndicator = (TextView) findViewById(R.id.music_indicator);
-		surveyIndicator = (TextView) findViewById(R.id.survey_indicator);
+		whiteIndicator = (ImageView) findViewById(R.id.whiteboard_indicator);
+		pictureIndicator = (ImageView) findViewById(R.id.picture_indicator);
+		vidIndicator = (ImageView) findViewById(R.id.video_indicator);
+		docIndicator = (ImageView) findViewById(R.id.document_indicator);
+		musicIndicator = (ImageView) findViewById(R.id.music_indicator);
+		surveyIndicator = (ImageView) findViewById(R.id.survey_indicator);
 
 		TextView txt1 = (TextView) findViewById(R.id.whiteboard);
 		TextView txt2 = (TextView) findViewById(R.id.picture);
@@ -111,22 +110,23 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 		case HOST:
 			break;
 		case DOCUMENT:
-			docIndicator.setText(String.valueOf(members));
+			docIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
 			break;
 		case MUSIC:
-			musicIndicator.setText(String.valueOf(members));
+			musicIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
 			break;
 		case PICTURE:
-			pictureIndicator.setText(String.valueOf(members));
+			pictureIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
 			break;
 		case VIDEO:
-			vidIndicator.setText(String.valueOf(members));
+			vidIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
 			break;
 		case WHITEBOARD:
-			whiteIndicator.setText(String.valueOf(members));
+			whiteIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
+			//whiteIndicator.setText(String.valueOf(members));
 			break;
 		case SURVEY:
-			surveyIndicator.setText(String.valueOf(members));
+			surveyIndicator.setVisibility((members == 0)?View.INVISIBLE:View.VISIBLE);
 		default:
 			break;
 
@@ -134,20 +134,10 @@ public class HostOptionsActivity extends Activity implements OnClickListener {
 	}
 
 	public static void addMemberToList(String member) {
-
-		//drawerListAdapter.clear();
-		/*
-		 * drawerListAdapter.addAll(ChordConnectionManager.getInstance()
-		 * .getArrMembers());
-		 */
-
-		
-		
 		drawerListAdapter.add(member);
 		drawerListAdapter.notifyDataSetChanged();
 	}
 	public static void removeMemberFromList(String member) {
-
 		drawerListAdapter.remove(member);
 		drawerListAdapter.notifyDataSetChanged();
 	}

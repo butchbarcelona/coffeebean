@@ -1,5 +1,7 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import android.bluetooth.BluetoothAdapter;
+
 public class Global{
 	
 	private static String color;
@@ -20,7 +22,8 @@ public class Global{
 	   color = aColor;
 	}
 	public static String getPlayerName() {
-		return playerName;
+		return (playerName == null || playerName.isEmpty())?BluetoothAdapter
+				.getDefaultAdapter().getName():playerName;
 	}
 	
 	public static void setPlayerName(String aplayerName) {

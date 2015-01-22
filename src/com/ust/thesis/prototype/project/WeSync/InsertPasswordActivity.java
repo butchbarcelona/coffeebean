@@ -8,6 +8,8 @@ import com.samsung.android.sdk.chord.Schord;
 import com.samsung.android.sdk.chord.SchordChannel;
 import com.samsung.android.sdk.chord.SchordManager;
 import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
+import com.ust.thesis.prototype.project.WeSync.chord.CWifiConnectivity;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -33,6 +35,7 @@ public class InsertPasswordActivity extends Activity {
     Button member;
     EditText player;
     TextView playertextview;
+    EditText pass;
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,13 +60,22 @@ public class InsertPasswordActivity extends Activity {
         txtb.setTypeface(font);
         txtc.setTypeface(font);
         
+        pass = (EditText) findViewById(R.id.createPass);
+        
+
+		CWifiConnectivity wifiConnect = new CWifiConnectivity(
+				this.getApplicationContext());
+		wifiConnect.turnOnOffWifi(true);
+        
         
         member.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+            	ChordConnectionManager.getInstance().setChannelPass(pass.getText().toString());
             	Global.setPlayerName(player.getText().toString());
                 Intent shareHost = new Intent (getApplicationContext(), HostOptionsActivity.class);
-               startActivity(shareHost);
+                startActivity(shareHost);
                 finish();
             }
         });

@@ -1,10 +1,13 @@
 package com.ust.thesis.prototype.project.WeSync;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.UUID;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import android.annotation.SuppressLint;
@@ -47,8 +50,7 @@ public class DocumentActivity extends ChordActivity {
 	AlertDialog levelDialog;
 	int countfile = 0;
 	static ProgressDialog progressDialog;
-	
-	
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -79,7 +81,6 @@ public class DocumentActivity extends ChordActivity {
 			@SuppressLint("WrongCall")
 			@Override
 			public void onClick(View v) {
-				
 
 				String[] tempname = mname.split("%%%%%%");
 				String[] temppath = mpath.split("%%%%%%");
@@ -119,22 +120,28 @@ public class DocumentActivity extends ChordActivity {
 										f = new RandomAccessFile(file, "r");
 
 										byte[] data = new byte[(int) f.length()];
+										byte[][] payload = new byte[2][];
+										payload[0] = data;
+										payload[1] = musicname[item].toString()
+												.getBytes();
+										
+										pdfName = musicname[item].toString();
+										pdfBytes = data;
+
 										f.readFully(data);
 
-										pdfLoadImages(DocumentActivity.this.getApplicationContext(),data);
-
-										byte[][] payload = new byte[1][];
-										payload[0] = data;
+										pdfLoadImages(DocumentActivity.this
+												.getApplicationContext(),
+												payload);
 
 										ChordConnectionManager
 												.getInstance()
 												.sendData(
 														payload,
 														ChordMessageType.SHOW_DOCUMENT);
-										
+
 										wv.loadUrl("about:blank");
-										progressDialog = ProgressDialog.show(
-												DocumentActivity.this, "", "Opening...");
+										
 
 									} catch (FileNotFoundException e) {
 										// TODO Auto-generated catch block
@@ -157,10 +164,11 @@ public class DocumentActivity extends ChordActivity {
 			}
 		});
 
-//		progressDialog = new ProgressDialog(this);
+		// progressDialog = new ProgressDialog(this);
 		/*
-		progressDialog.setMessage("Opening...");*/
-		//.show(ctx, "", "Opening...");
+		 * progressDialog.setMessage("Opening...");
+		 */
+		// .show(ctx, "", "Opening...");
 	}
 
 	@Override
@@ -220,19 +228,86 @@ public class DocumentActivity extends ChordActivity {
 	private static WebView wv;
 	private static int ViewSize = 0;
 
-	// Load Images:
-	public static void pdfLoadImages(final Context ctx, final byte[] data) {
+	public void saveDocument(View v) {
+		String path = 
+				//Environment.getExternalStorageDirectory().getAbsolutePath()
+				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) 
+				+"/"+ pdfName;
+
+		BufferedOutputStream bos = null;
 		try {
+
+			File theFile = new File(path);
+			if (!theFile.exists()) {
+				theFile.createNewFile();
+
+			}
+
+			FileOutputStream fos = new FileOutputStream(theFile, false);
+			bos = new BufferedOutputStream(fos);
+			bos.write(pdfBytes);
+
+			Toast.makeText(getApplicationContext(), pdfName + " saved!",
+					Toast.LENGTH_SHORT).show();
+
+		} catch (FileNotFoundException e) {
+			// handle exception
+			Toast.makeText(getApplicationContext(), "Oops! Could not save :( ",
+					Toast.LENGTH_SHORT).show();
+		} catch (IOException e) {
+			// handle exception
+			Toast.makeText(getApplicationContext(), "Oops! Could not save :( ",
+					Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+			// handle exception
+			Toast.makeText(getApplicationContext(), "Oops! Could not save :( ",
+					Toast.LENGTH_SHORT).show();
+		} finally {
+			if (bos != null) {
+				try {
+					// flush and close the BufferedOutputStream
+					bos.flush();
+					bos.close();
+
+				} catch (Exception e) {
+				}
+			}
+		}
+	}
+
+	static byte[] pdfBytes;
+	static String pdfName;
+	Context ctx = this;
+
+	// Load Images:
+	public static void pdfLoadImages(final Context ctx, final byte[][] fullData) {
+		try {
+
+			final byte[] data = fullData[0];
+
+			pdfName = new String(fullData[1]);
+			pdfBytes = data;
+
 			// run async
 			new AsyncTask<Void, Void, String>() {
 				// create and show a progress dialog
 
+				@Override
+				protected void onPreExecute() {
+					
+					progressDialog = ProgressDialog.show(
+							ctx, "",
+							"Opening...");
+				};
+				
 				
 				
 				@Override
 				protected void onPostExecute(String html) {
 					// after async close progress dialog
-					progressDialog.dismiss();
+					
+					if(progressDialog != null)
+						progressDialog.dismiss();
 
 					// imageView1.setImageBitmap(scaled);
 					// load the html in the webview
@@ -246,24 +321,47 @@ public class DocumentActivity extends ChordActivity {
 					try {
 						// create pdf document object from bytes
 						ByteBuffer bb = ByteBuffer.NEW(data);
+
 						PDFFile pdf = new PDFFile(bb);
+
 						// Get the first page from the pdf doc
 						PDFPage PDFpage = pdf.getPage(1, true);
 						// create a scaling value according to the WebView Width
 						final float scale = ViewSize / PDFpage.getWidth()
 								* 0.95f;
 						// convert the page into a bitmap with a scaling value
-						
-						  Bitmap page = PDFpage.getImage( (int)
-						  (PDFpage.getWidth() * scale), (int)
-						  (PDFpage.getHeight() * scale), null, true, true);
-						 
-/*						Bitmap page = PDFpage.getImage((getWindowManager()
-								.getDefaultDisplay().getWidth()),
-								(getWindowManager().getDefaultDisplay()
-										.getHeight()), null, true, true);
-*/
+
+						Bitmap page = PDFpage.getImage(
+								(int) (PDFpage.getWidth() * scale),
+								(int) (PDFpage.getHeight() * scale), null,
+								true, true);
+
+						/*
+						 * Bitmap page = PDFpage.getImage((getWindowManager()
+						 * .getDefaultDisplay().getWidth()),
+						 * (getWindowManager().getDefaultDisplay()
+						 * .getHeight()), null, true, true);
+						 */
+						// TONNY
 						// save the bitmap to a byte array
+						/*
+						 * FileOutputStream out = null;
+						 * 
+						 * String path =
+						 * Environment.getExternalStorageDirectory()
+						 * .getAbsolutePath() + (UUID .randomUUID() .toString())
+						 * +".mp4";
+						 * 
+						 * try { out = new FileOutputStream(path);
+						 * page.compress(Bitmap.CompressFormat.PNG, 100, out);
+						 * // bmp is your Bitmap instance // PNG is a lossless
+						 * format, the compression factor (100) is ignored }
+						 * catch (Exception e) { e.printStackTrace(); } finally
+						 * { try { if (out != null) { out.close(); } } catch
+						 * (IOException e) { e.printStackTrace(); } }
+						 */
+
+						// TONNY end
 
 						ByteArrayOutputStream stream = new ByteArrayOutputStream();
 						page.compress(Bitmap.CompressFormat.PNG, 100, stream);

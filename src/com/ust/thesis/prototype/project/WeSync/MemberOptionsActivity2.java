@@ -70,7 +70,7 @@ public class MemberOptionsActivity2 extends Activity {
             @Override
             public void onClick(View v) {
                 Intent music = new Intent(getApplicationContext(),
-                        MusicActivity.class);
+                        MusicActivity___.class);
                 startActivity(music);
             }
         });

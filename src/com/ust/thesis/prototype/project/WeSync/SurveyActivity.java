@@ -49,10 +49,8 @@ public class SurveyActivity extends ChordActivity {
 	ArrayList<String> arrAnswers;
 	String answers;
 
-	
-	
-	public static boolean  isHost = false;
-	
+	public static boolean isHost = false;
+
 	public static int score = 0;
 	static String correctAnswer;
 	static LinearLayout createSurveyButtons, answerSurveyButtons, all;
@@ -63,8 +61,7 @@ public class SurveyActivity extends ChordActivity {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
 		surveyAnswersintent = null;
-		
-		
+
 		finish();
 	}
 
@@ -77,7 +74,7 @@ public class SurveyActivity extends ChordActivity {
 		setContentView(R.layout.survey_activity);
 
 		ctx = this;
-		
+
 		answers = null;
 		arrQuestions = new ArrayList<SurveyQuestion>();
 		arrAnswers = new ArrayList<String>();
@@ -118,13 +115,11 @@ public class SurveyActivity extends ChordActivity {
 		all = (LinearLayout) findViewById(R.id.allSurvey);
 		tvWaitingQuestions = (TextView) findViewById(R.id.tv_waiting_questions);
 
-		
-		if(!ChordConnectionManager.getInstance().isHost){
+		if (!ChordConnectionManager.getInstance().isHost) {
 			all.setVisibility(View.GONE);
 			tvWaitingQuestions.setVisibility(View.VISIBLE);
 		}
-		
-		
+
 		al = new ArrayList<String>();// initialize array list
 		al = new ArrayList<String>();
 		al.clear();
@@ -147,12 +142,12 @@ public class SurveyActivity extends ChordActivity {
 
 				String strA = String.valueOf(lv.getItemAtPosition(lv
 						.getCheckedItemPosition()));
-				answers += "<>"+ strA;// String.valueOf(lv.getSelectedItem());
+				answers += "<>" + strA;// String.valueOf(lv.getSelectedItem());
 
-				if(correctAnswer.equals(strA)){
+				if (correctAnswer.equals(strA)) {
 					score++;
 				}
-				
+
 				if (arrQuestions.size() >= 1) {
 					showQuestion(arrQuestions.get(0));
 					arrQuestions.remove(0);
@@ -165,12 +160,12 @@ public class SurveyActivity extends ChordActivity {
 					byte[][] payload = new byte[1][];
 					// answers = BluetoothAdapter.getDefaultAdapter().getName()
 					// +"<>"+answers;
-					answers += "||"+score;
+					answers += "||" + score;
 					payload[0] = answers.getBytes();
 
 					ChordConnectionManager.getInstance().sendData(payload,
 							ChordMessageType.SHOW_SURVEY);
-					
+
 					all.setVisibility(View.GONE);
 					tvWaitingQuestions.setVisibility(View.VISIBLE);
 					tvWaitingQuestions.setText("Successfully sent answers.");
@@ -185,18 +180,30 @@ public class SurveyActivity extends ChordActivity {
 				// TODO Auto-generated method stub
 
 				String ques = questions.getText().toString();
-				questions.setText("");
 
-				arrQuestions.add(new SurveyQuestion(ques,
-						(ArrayList<String>) arrAnswers.clone(), String
-								.valueOf(lv.getItemAtPosition(lv
-										.getCheckedItemPosition()))// lv.getSelectedItem()
-						// arrAnswers.get(0)
-						));// TODO: get correct
+				if (arrAnswers.size() < 1) {
+					Toast.makeText(getApplicationContext(),
+							"Cannot add survey question with empty options.",
+							Toast.LENGTH_SHORT).show();
+				} else if (ques.isEmpty()) {
+					Toast.makeText(getApplicationContext(),
+							"Cannot add empty survey question.",
+							Toast.LENGTH_SHORT).show();
+				} else {
 
-				al.clear();
-				aa.notifyDataSetChanged();
-				arrAnswers.clear();
+					questions.setText("");
+
+					arrQuestions.add(new SurveyQuestion(ques,
+							(ArrayList<String>) arrAnswers.clone(), String
+									.valueOf(lv.getItemAtPosition(lv
+											.getCheckedItemPosition()))// lv.getSelectedItem()
+							// arrAnswers.get(0)
+							));// TODO: get correct
+
+					al.clear();
+					aa.notifyDataSetChanged();
+					arrAnswers.clear();
+				}
 			}
 		});
 
@@ -222,44 +229,60 @@ public class SurveyActivity extends ChordActivity {
 							.show();
 				} else {
 
-					broadcast.setVisibility(View.GONE);
-					addPolls.setVisibility(View.GONE);
-					addQuestion.setVisibility(View.GONE);
-					lv.setVisibility(View.GONE);
-					questions.setVisibility(View.GONE);
-					questiontextView.setVisibility(View.VISIBLE);
-					questiontextView
-							.setText("Waiting for answers. Please wait...");
-					addPolls.setText("Waiting for answers");
-					addPolls.setClickable(false);
+				
 
-					// add last question
-					arrQuestions.add(new SurveyQuestion(questions.getText()
-							.toString(), arrAnswers, arrAnswers.get(0)));
+					String ques = questions.getText().toString();
 
-					StringBuilder str = null;
+					if (arrAnswers.size() < 1) {
+						Toast.makeText(
+								getApplicationContext(),
+								"Cannot add survey question with empty options.",
+								Toast.LENGTH_SHORT).show();
+					} else if (ques.isEmpty()) {
+						Toast.makeText(getApplicationContext(),
+								"Cannot add empty survey question.",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						 
+						broadcast.setVisibility(View.GONE);
+						addPolls.setVisibility(View.GONE);
+						addQuestion.setVisibility(View.GONE);
+						lv.setVisibility(View.GONE);
+						questions.setVisibility(View.GONE);
+						questiontextView.setVisibility(View.VISIBLE);
+						questiontextView
+								.setText("Waiting for answers. Please wait...");
+						addPolls.setText("Waiting for answers");
+						addPolls.setClickable(false);
+						
+						// add last question
+						arrQuestions.add(new SurveyQuestion(ques, arrAnswers,
+								arrAnswers.get(0)));
 
-					for (SurveyQuestion q : arrQuestions) {
+						StringBuilder str = null;
 
-						if (str == null)
-							str = new StringBuilder();
-						else
-							str.append("^^");
+						for (SurveyQuestion q : arrQuestions) {
 
-						str.append(q.question).append("**");
+							if (str == null)
+								str = new StringBuilder();
+							else
+								str.append("^^");
 
-						for (String a : q.answers)
-							str.append(a).append("~~");
+							str.append(q.question).append("**");
 
-						str.append(q.correctAnswer);
+							for (String a : q.answers)
+								str.append(a).append("~~");
+
+							str.append(q.correctAnswer);
+						}
+
+						byte[][] payload = new byte[1][];
+						payload[0] = str.toString().getBytes();
+
+						isHost = true;
+						ChordConnectionManager.getInstance().sendData(payload,
+								ChordMessageType.SHOW_SURVEY);
 					}
-
-					byte[][] payload = new byte[1][];
-					payload[0] = str.toString().getBytes();
-
-					isHost = true;
-					ChordConnectionManager.getInstance().sendData(payload,
-							ChordMessageType.SHOW_SURVEY);
 
 				}
 			}
@@ -286,15 +309,16 @@ public class SurveyActivity extends ChordActivity {
 								Editable value = input.getText();
 								// Do something with value!
 
-								al.add(0, value.toString());
-								// step ii: notify to adapter
-								aa.notifyDataSetChanged();
-								// step iii: clr edit text
-								// answers = answers + "~~" + value;
-								arrAnswers.add(value.toString());
-								lv.setItemChecked(0, true);
-								// answers = answers + "^" + value;
-								// System.out.println("Answers : " + answers);
+								if (value.toString().isEmpty()) {
+									Toast.makeText(getApplicationContext(),
+											"Cannot add empty option.",
+											Toast.LENGTH_SHORT).show();
+								} else {
+									al.add(0, value.toString());
+									aa.notifyDataSetChanged();
+									arrAnswers.add(value.toString());
+									lv.setItemChecked(0, true);
+								}
 							}
 						});
 
@@ -312,18 +336,17 @@ public class SurveyActivity extends ChordActivity {
 		});
 
 	}
-	
 
 	public static void saveMsg(byte[] payload) {
-		/*if (SurveyActivity.isRunning()) {
+		if (SurveyActivity.isRunning()) {
 			showSurvey(payload);
-		}else*/
-			//msgs = payload;
+		} else{ 
 			
-		if(!ChordConnectionManager.getInstance().isHost)
-			msgs = payload;
-		
-		showSurvey(payload);
+			if (!ChordConnectionManager.getInstance().isHost)
+				msgs = payload;
+			else
+				SurveyPlayerAnswersActivity.addAnswers(payload);
+		}
 	}
 
 	public void showQuestion(SurveyQuestion sq) {
@@ -333,51 +356,42 @@ public class SurveyActivity extends ChordActivity {
 			al.add(0, sq.answers.get(i));
 			aa.notifyDataSetChanged();
 		}
-		
+
 		lv.setItemChecked(0, true);
 
 		correctAnswer = sq.correctAnswer;
 		questiontextView.setText(sq.question);
 	}
 
-
 	static Intent surveyAnswersintent = null;
 	static Context ctx;
-	
-	static byte[] msgs ;
-	
+
+	static byte[] msgs;
+
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-	
-		
-		if(!ChordConnectionManager.getInstance().isHost){
-			if(msgs != null){
+
+		if (!ChordConnectionManager.getInstance().isHost) {
+			if (msgs != null) {
 				showSurvey(msgs);
 			}
-			
+
 			msgs = null;
 		}
-	
+
 	}
-	
+
 	public static ArrayList<byte[]> mapAnswers = null;
-	
+
 	public static void showSurvey(byte[] payload) {
 		String message = new String(payload);
 		if (message.startsWith("^^^")) {
-			if (SurveyActivity.isHost) {  
-				
-			/*	if(mapAnswers == null){
-					mapAnswers  = new ArrayList<byte[]>();
-				}
-				
-				mapAnswers.add(payload);*/
-				
+			if (SurveyActivity.isHost) {
 				if (surveyAnswersintent != null) {
 					SurveyPlayerAnswersActivity.addAnswers(payload);
-				} else {
+				} else {					
 					surveyAnswersintent = new Intent(ctx,
 							SurveyPlayerAnswersActivity.class);
 					surveyAnswersintent.putExtra("msgs", payload);
@@ -385,13 +399,14 @@ public class SurveyActivity extends ChordActivity {
 					((Activity) ctx).finish();
 				}
 			}
-			
-		} else
-		if (!ChordConnectionManager.getInstance().isHost) {
 
-			all.setVisibility(View.VISIBLE);
-			tvWaitingQuestions.setVisibility(View.GONE);
-			
+		} else if (!ChordConnectionManager.getInstance().isHost) {
+
+			if (all != null) {
+				all.setVisibility(View.VISIBLE);
+				tvWaitingQuestions.setVisibility(View.GONE);
+			}
+
 			score = 0;
 			arrQuestions = new ArrayList<SurveyQuestion>();
 			ArrayList<String> arrAnswers = new ArrayList<String>();
@@ -422,7 +437,7 @@ public class SurveyActivity extends ChordActivity {
 			lv.setItemChecked(0, true);
 
 			correctAnswer = arrQuestions.get(0).correctAnswer;
-			
+
 			createSurveyButtons.setVisibility(View.GONE);
 			answerSurveyButtons.setVisibility(View.VISIBLE);
 
@@ -435,23 +450,7 @@ public class SurveyActivity extends ChordActivity {
 			if (arrQuestions.size() == 0)
 				nextQuestion.setText("Send answer");
 
-		} /*else {
-			deviceanswer.setVisibility(View.VISIBLE);
-			devicename.setVisibility(View.VISIBLE);
-			String[] splitans = message.split("<>");
-			devicename.setText("Player Name\n"
-					+ devicename.getText().toString() + "\n" + splitans[0]);
-
-			deviceanswer.setText("Player Answer\n"
-					+ deviceanswer.getText().toString() + "\n" + message);
-
-			lv.setVisibility(View.GONE);
-
-			questiontextView.setVisibility(View.GONE);
-			answerSurveyButtons.setVisibility(View.GONE);
-			createSurveyButtons.setVisibility(View.GONE);
-
-		}*/
+		}
 	}
 
 }

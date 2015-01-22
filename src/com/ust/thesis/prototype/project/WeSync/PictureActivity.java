@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
@@ -38,6 +39,7 @@ import android.graphics.Point;
 import android.graphics.Paint.Cap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -137,7 +139,7 @@ public class PictureActivity extends ChordActivity {
 					levelDialog.show();
 
 				} else {
-					Toast.makeText(PictureActivity.this, "NO MUSIC FOUND",
+					Toast.makeText(PictureActivity.this, "NO PICTURE FOUND",
 							Toast.LENGTH_SHORT).show();
 				}
 
@@ -202,6 +204,29 @@ public class PictureActivity extends ChordActivity {
 		} else{
 			bmpMsg = bmp;
 		}
+	}
+	
+	public void saveImage(View v){
+		
+		String h = "";
+
+		imageView1.setDrawingCacheEnabled(true);
+		String imgSaved = MediaStore.Images.Media.insertImage(this.getContentResolver(),
+						imageView1.getDrawingCache(), button1.getText().toString(), "from WeSync");
+		
+		if (imgSaved != null) {
+			Toast.makeText(
+					getApplicationContext(),
+					"Picture saved to Gallery!",
+					Toast.LENGTH_SHORT).show();
+		} else {
+
+			Toast.makeText(
+					getApplicationContext(),
+					"Oops! Image could not be saved :( ",
+					Toast.LENGTH_SHORT).show();
+		}
+		imageView1.destroyDrawingCache();
 	}
 
 }

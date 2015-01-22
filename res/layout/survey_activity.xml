@@ -177,7 +177,7 @@
                     android:id="@+id/broadcast"
                     style="@style/ButtonText4"
                     android:layout_width="wrap_content"
-                    android:layout_height="37dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/btn_pink2"
                     android:text="Broadcast" />

@@ -1,27 +1,18 @@
 package com.ust.thesis.prototype.project.WeSync;
 
-import java.util.List;
-
-import com.samsung.android.sdk.SsdkUnsupportedException;
-import com.samsung.android.sdk.chord.InvalidInterfaceException;
-import com.samsung.android.sdk.chord.Schord;
-import com.samsung.android.sdk.chord.SchordChannel;
-import com.samsung.android.sdk.chord.SchordManager;
-import com.samsung.android.sdk.chord.SchordManager.NetworkListener;
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.ust.thesis.prototype.project.WeSync.chord.CWifiConnectivity;
+import com.ust.thesis.prototype.project.WeSync.chord.ChordConnectionManager;
 
 /**
  * Created by robertjordanebdalin on 8/28/14.
@@ -29,7 +20,7 @@ import android.widget.Toast;
 public class CreatePasswordActivity extends Activity {
 	
     Button host;
-   
+   EditText pass;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +36,18 @@ public class CreatePasswordActivity extends Activity {
         txt.setTypeface(font);
         txta.setTypeface(font);
 
+
+        pass = (EditText) findViewById(R.id.createPass);
+
+		CWifiConnectivity wifiConnect = new CWifiConnectivity(
+				this.getApplicationContext());
+
+		wifiConnect.turnOnOffHotspot(true);
+        
         host.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            	
+            	ChordConnectionManager.getInstance().setChannelPass(pass.getText().toString());
                 Intent shareHost = new Intent (getApplicationContext(), HostOptionsActivity.class);
                 startActivity(shareHost);
                 finish();

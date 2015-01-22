@@ -24,17 +24,7 @@ public class SurveyPlayerAnswersActivity extends ChordActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.survey_answers_activity);
 		lv = (ListView) findViewById(R.id.lv_survey_answers);
-		/*
-		 * al = new ArrayList<String>();// initialize array list al = new
-		 * ArrayList<String>(); al.clear();
-		 * 
-		 * aa = new ArrayAdapter<String>(this,
-		 * android.R.layout.simple_list_item_checked //
-		 * ,R.layout.survey_list_item // ,R.id.tv_poll_answer , al);// step4 :
-		 * establish
-		 * 
-		 * lv.setAdapter(aa);
-		 */
+		
 
 		lva = new ListAdapter(this);
 		lv.setAdapter(lva);
@@ -42,7 +32,7 @@ public class SurveyPlayerAnswersActivity extends ChordActivity {
 		addAnswers(this.getIntent().getByteArrayExtra("msgs"));
 
 	}
-
+	
 	public static void addAnswers(byte[] payload) {
 		String message = new String(payload);
 		ArrayList<String> arrAnswers = null;
@@ -59,7 +49,7 @@ public class SurveyPlayerAnswersActivity extends ChordActivity {
 		answers.put(name, arrAnswers);
 
 		lva.notifyDataSetChanged();
-		//lv.invalidate();
+		lv.invalidate();
 	}
 
 	@Override
